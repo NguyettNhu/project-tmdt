@@ -15,7 +15,6 @@ export default async function ProductPage({ params }: Props) {
 
   return (
     <div className="w-full bg-white">
-      <Header />
 
       <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">

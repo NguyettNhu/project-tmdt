@@ -10,9 +10,10 @@ export default function Header() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   const navItems = [
-    { label: 'New Arrivals', href: '/#new-arrivals' },
-    { label: 'Shop', href: '/#featured' },
-    { label: 'About', href: '/about' }
+    { label: 'Trang chủ', href: '/' },
+    { label: 'Cửa hàng', href: '/shop' },
+    { label: 'Về chúng tôi', href: '/about' },
+    { label: 'Liên hệ', href: '/contact' }
   ];
   const { count } = useCart();
 
@@ -53,7 +54,7 @@ export default function Header() {
               </Link>
               <Link 
                 href="/auth/register" 
-                className="text-white font-semibold text-sm transition-all duration-200 bg-gradient-to-r from-[#D9006C] to-[#FF1A7A] px-5 py-2.5 rounded-full hover:shadow-lg hover:scale-105 active:scale-95"
+                className="text-white font-semibold text-sm transition-all duration-200 bg-linear-to-r from-[#D9006C] to-[#FF1A7A] px-5 py-2.5 rounded-full hover:shadow-lg hover:scale-105 active:scale-95"
               >
                 Đăng kí
               </Link>

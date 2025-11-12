@@ -1,6 +1,7 @@
 "use client";
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useCart } from './CartContext';
 
 function formatCurrency(n: number) {
@@ -8,6 +9,7 @@ function formatCurrency(n: number) {
 }
 
 export default function Cart() {
+  const router = useRouter();
   const { items, updateQty, removeItem, clearCart, subtotal } = useCart();
 
   const handleCheckout = () => {
@@ -15,8 +17,7 @@ export default function Cart() {
       alert('Giỏ hàng đang trống.');
       return;
     }
-    alert(`Checkout — tổng: ${formatCurrency(subtotal)} (chức năng demo)`);
-    clearCart();
+    router.push('/shipping');
   };
 
   return (
@@ -81,7 +82,15 @@ export default function Cart() {
 
             <div className="mb-4 text-sm text-[#1A1A1A]/70">Phí vận chuyển và thuế sẽ được tính khi thanh toán.</div>
 
-            <button onClick={handleCheckout} className="w-full px-4 py-3 bg-[#D9006C] text-white font-semibold rounded-full hover:bg-[#b30056]">Thanh toán</button>
+            <button onClick={handleCheckout} className="w-full px-4 py-3 bg-[#D9006C] text-white font-semibold rounded-full hover:bg-[#b30056] transition-colors">
+              Tiến hành thanh toán
+            </button>
+            <Link 
+              href="/shop" 
+              className="block w-full text-center px-4 py-3 mt-3 border-2 border-gray-200 text-gray-700 font-semibold rounded-full hover:border-[#D9006C] hover:bg-[#FFF0F6] transition-all"
+            >
+              Tiếp tục mua sắm
+            </Link>
           </aside>
         </div>
       )}

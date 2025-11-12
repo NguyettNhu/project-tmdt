@@ -175,10 +175,10 @@ export default function AboutPage() {
             className="grid grid-cols-2 lg:grid-cols-4 gap-8"
           >
             {[
-              { name: "Minh Anh", role: "Creative Director", emoji: "Artist", color: "from-[#D9006C] to-[#FF1A7A]" },
-              { name: "Hoàng Nam", role: "Head of Production", emoji: "Gear", color: "from-[#FF1A7A] to-[#FF69B4]" },
-              { name: "Thảo Linh", role: "Customer Happiness", emoji: "Speech Bubble", color: "from-[#FF69B4] to-[#FFC0E0]" },
-              { name: "Khánh Vân", role: "Sustainability Lead", emoji: "Leaf", color: "from-[#FFE8F4] to-[#D9006C]" }
+              { name: "Như Nguyệt", role: "Creative Director", emoji: "Founder", color: "from-[#D9006C] to-[#FF1A7A]" },
+              { name: "Đức Cường", role: "Head of Production", emoji: "Co-Founder", color: "from-[#FF1A7A] to-[#FF69B4]" },
+              { name: "Khánh Ly", role: "Sustainability Lead", emoji: "Co-Founder", color: "from-[#FF69B4] to-[#FFC0E0]" },
+              { name: "Chat Bot", role: "Customer Happiness", emoji: "Leaf", color: "from-[#FFE8F4] to-[#D9006C]" }
             ].map((member, i) => (
               <motion.div
                 key={i}
@@ -188,7 +188,7 @@ export default function AboutPage() {
               >
                 <div className={`absolute inset-0 bg-gradient-to-br ${member.color} opacity-0 group-hover:opacity-20 transition-opacity`}></div>
                 <div className="p-10 text-center">
-                  <div className="text-7xl mb-6 group-hover:scale-110 transition-transform duration-500">
+                  <div className="text-4xl mb-6 group-hover:scale-110 transition-transform duration-500">
                     {member.emoji}
                   </div>
                   <h3 className="text-xl font-bold text-gray-900 mb-1">{member.name}</h3>
