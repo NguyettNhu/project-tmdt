@@ -1,89 +1,68 @@
-import Header from "@/components/Header";
-import ProductCard from "@/components/ProductCard";
+// app/page.tsx
+import ProductCard from '@/components/ProductCard';
+import { getAllProducts } from '@/lib/products';
+import Link from 'next/link';
 
-const featuredProducts = [
-  {
-    id: 1,
-    name: "Minimalist White T-Shirt",
-    price: 89.99,
-    image: "https://via.placeholder.com/500x500/FFFFFF/D9006C?text=White+T-Shirt",
-  },
-  {
-    id: 2,
-    name: "Bold Black Oversized Hoodie",
-    price: 129.99,
-    image: "https://via.placeholder.com/500x500/1A1A1A/FFFFFF?text=Black+Hoodie",
-  },
-  {
-    id: 3,
-    name: "Classic Denim Jacket",
-    price: 159.99,
-    image: "https://via.placeholder.com/500x500/4A5568/FFFFFF?text=Denim+Jacket",
-  },
-  {
-    id: 4,
-    name: "Elegant Tailored Blazer",
-    price: 199.99,
-    image: "https://via.placeholder.com/500x500/2D3748/FFFFFF?text=Tailored+Blazer",
-  },
-];
+export default function HomePage() {
+  const products = getAllProducts();
 
-export default function Home() {
   return (
-        <div className="w-full bg-white">
-      <Header />
-
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col w-full gap-8 ">
+    
+      
       {/* Hero Section */}
-      <section className="w-full min-h-screen flex items-center justify-center overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-            {/* Left Content */}
-            <div className="flex flex-col justify-center">
-              <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black leading-tight mb-6 text-[#1A1A1A] tracking-tight">
-                MODERN
-                <br />
-                ESSENTIALS
-              </h1>
-
-              <p className="text-lg sm:text-xl text-[#1A1A1A] mb-10 font-light leading-relaxed max-w-md">
-                Discover our curated collection of timeless pieces designed for the modern minimalist. 
-                Bold statement. Clean aesthetics.
-              </p>
-
-              <button className="inline-flex items-center justify-center px-8 py-4 bg-[#D9006C] text-white font-semibold rounded-full transition-all duration-300 hover:bg-[#b30056] active:scale-95 w-fit">
-                Shop Now
-              </button>
-            </div>
-
-            {/* Right Image */}
-            <div className="relative h-96 sm:h-[500px] lg:h-[600px] w-full rounded-2xl overflow-hidden shadow-lg bg-linear-to-br from-[#D9006C] to-[#FFF0F6] flex items-center justify-center">
-              <div className="text-center">
-                <div className="text-6xl mb-4">👗</div>
-                <p className="text-white font-bold text-lg">Modern Fashion</p>
-              </div>
+      <section className="relative w-full bg-linear-to-br from-[#FFF0F6] via-white to-[#FFE8F4] py-20 lg:py-32 overflow-hidden">
+        <div className="absolute top-10 right-10 w-72 h-72 bg-[#D9006C] rounded-full blur-3xl opacity-10"></div>
+        <div className="absolute bottom-10 left-10 w-96 h-96 bg-[#FF1A7A] rounded-full blur-3xl opacity-10"></div>
+        
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black mb-6 text-gray-900 tracking-tight">
+              Modern Fashion
+              <br />
+              <span className="bg-linear-to-r from-[#D9006C] to-[#FF1A7A] bg-clip-text text-transparent">
+                Essentials
+              </span>
+            </h1>
+            <p className="text-xl text-gray-600 text-center mb-8 w-full mx-auto">
+              Khám phá bộ sưu tập thời trang hiện đại với thiết kế tối giản táo bạo
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link
+                href="#products"
+                className="inline-flex items-center justify-center px-8 py-4 bg-linear-to-r from-[#D9006C] to-[#FF1A7A] text-white font-bold rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300"
+              >
+                Khám phá ngay
+                <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                </svg>
+              </Link>
+              <Link
+                href="/about"
+                className="inline-flex items-center justify-center px-8 py-4 bg-white text-[#D9006C] font-bold rounded-full border-2 border-[#D9006C] hover:bg-[#D9006C] hover:text-white transition-all duration-300"
+              >
+                Về chúng tôi
+              </Link>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Featured Products Section */}
-      <section className="py-20 md:py-28 lg:py-32 w-full">
+      {/* Products Section */}
+      <section id="products" className="py-16 lg:py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Section Title */}
-          <div className="mb-16">
-            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black text-[#1A1A1A] mb-4">
-              Featured Collection
+          <div className="text-center mb-12">
+            <h2 className="text-4xl sm:text-5xl font-black text-gray-900 mb-4">
+              Sản phẩm nổi bật
             </h2>
-            <p className="text-lg text-[#1A1A1A]/70 font-light">
-              Hand-picked essentials for your wardrobe
-            </p>
+          
           </div>
 
-          {/* Products Grid */}
+          <div className='p-4'>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {featuredProducts.map((product) => (
-              <ProductCard
-                key={product.id}
+            {products.map((product) => (
+              <ProductCard 
+                key={product.id} 
                 id={product.id}
                 name={product.name}
                 price={product.price}
@@ -91,48 +70,46 @@ export default function Home() {
               />
             ))}
           </div>
-
-          {/* CTA Button */}
-          <div className="flex justify-center mt-16">
-            <button className="px-10 py-4 bg-[#1A1A1A] text-white font-semibold rounded-full transition-all duration-300 hover:bg-[#D9006C]">
-              View All Products
-            </button>
           </div>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="w-full bg-[#FFF0F6] py-12 border-t border-[#F0F0F0]">
+      {/* Features Section */}
+      <section className="py-16 lg:py-24 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-12 mb-8">
-            <div>
-              <h3 className="text-lg font-bold text-[#1A1A1A] mb-4">STYLA</h3>
-              <p className="text-sm text-[#1A1A1A]/70 font-light">
-                Modern fashion for the minimalist soul.
-              </p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="text-center p-8 bg-white rounded-2xl shadow-sm hover:shadow-lg transition-shadow duration-300">
+              <div className="w-16 h-16 mx-auto mb-4 bg-linear-to-br from-[#D9006C] to-[#FF1A7A] rounded-2xl flex items-center justify-center">
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Chất lượng cao</h3>
+              <p className="text-gray-600">Chất liệu được chọn lọc kỹ càng, bền đẹp theo thời gian</p>
             </div>
-            <div>
-              <h4 className="text-sm font-bold text-[#1A1A1A] mb-4 uppercase tracking-wide">Shop</h4>
-              <ul className="space-y-2 text-sm text-[#1A1A1A]/70">
-                <li><a href="#" className="hover:text-[#D9006C] transition-colors">New Arrivals</a></li>
-                <li><a href="#" className="hover:text-[#D9006C] transition-colors">All Products</a></li>
-                <li><a href="#" className="hover:text-[#D9006C] transition-colors">Sale</a></li>
-              </ul>
+            
+            <div className="text-center p-8 bg-white rounded-2xl shadow-sm hover:shadow-lg transition-shadow duration-300">
+              <div className="w-16 h-16 mx-auto mb-4 bg-linear-to-br from-[#FF1A7A] to-[#FFC0E0] rounded-2xl flex items-center justify-center">
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Giao hàng nhanh</h3>
+              <p className="text-gray-600">Vận chuyển toàn quốc, giao hàng trong 2-3 ngày</p>
             </div>
-            <div>
-              <h4 className="text-sm font-bold text-[#1A1A1A] mb-4 uppercase tracking-wide">About</h4>
-              <ul className="space-y-2 text-sm text-[#1A1A1A]/70">
-                <li><a href="#" className="hover:text-[#D9006C] transition-colors">Our Story</a></li>
-                <li><a href="#" className="hover:text-[#D9006C] transition-colors">Contact</a></li>
-                <li><a href="#" className="hover:text-[#D9006C] transition-colors">Privacy</a></li>
-              </ul>
+            
+            <div className="text-center p-8 bg-white rounded-2xl shadow-sm hover:shadow-lg transition-shadow duration-300">
+              <div className="w-16 h-16 mx-auto mb-4 bg-linear-to-br from-[#FFC0E0] to-[#FFE8F4] rounded-2xl flex items-center justify-center">
+                <svg className="w-8 h-8 text-[#D9006C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Đổi trả dễ dàng</h3>
+              <p className="text-gray-600">Chính sách đổi trả trong 30 ngày, miễn phí hoàn toàn</p>
             </div>
-          </div>
-          <div className="border-t border-[#F0F0F0] pt-8 text-center text-sm text-[#1A1A1A]/60">
-            <p>&copy; 2024 STYLA. All rights reserved.</p>
           </div>
         </div>
-      </footer>
+      </section>
     </div>
   );
 }

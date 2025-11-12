@@ -1,64 +1,72 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
+import { useCart } from './CartContext';
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
-  const navItems = ['New Arrivals', 'Shop', 'About'];
+  const navItems = [
+    { label: 'New Arrivals', href: '/#new-arrivals' },
+    { label: 'Shop', href: '/#featured' },
+    { label: 'About', href: '/about' }
+  ];
+  const { count } = useCart();
 
   return (
-    <header className="w-full bg-white border-b border-[#F0F0F0] sticky top-0 z-50">
+    <header className="w-full bg-white/95 backdrop-blur-md border-b border-gray-100 sticky top-0 z-50 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20">
+        <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
-          <div className="shrink-0">
-            <h1 className="text-2xl font-black tracking-tight text-[#1A1A1A]">
+          <Link href="/" className="shrink-0 group">
+            <h1 className="text-2xl md:text-3xl font-black tracking-tight text-gray-900 group-hover:text-[#D9006C] transition-colors duration-200">
               STYLA
             </h1>
-          </div>
+          </Link>
 
           {/* Navigation - Desktop */}
-          <nav className="hidden md:flex items-center gap-12">
+          <nav className="hidden md:flex items-center gap-8 lg:gap-10">
             {navItems.map((item) => (
-              <a
-                key={item}
-                href={`#${item.toLowerCase().replace(' ', '-')}`}
-                className="text-[#1A1A1A] font-medium text-sm transition-colors duration-300 hover:text-[#D9006C]"
+              <Link
+                key={item.label}
+                href={item.href}
+                className="text-gray-700 font-medium text-sm hover:text-[#D9006C] transition-all duration-200 relative group"
               >
-                {item}
-              </a>
+                {item.label}
+                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-[#D9006C] group-hover:w-full transition-all duration-300"></span>
+              </Link>
             ))}
           </nav>
 
           {/* Icons - Auth, Cart & Search */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 md:gap-4">
             {/* Login & Register - Desktop */}
-            <div className="hidden md:flex items-center gap-8">
-              <a
+            <div className="hidden lg:flex items-center gap-6">
+              <Link
                 href="/auth/login"
-                className="text-[#1A1A1A] font-medium text-sm transition-colors duration-300 hover:text-[#D9006C]"
+                className="text-gray-700 font-medium text-sm hover:text-[#D9006C] transition-colors duration-200"
               >
                 Đăng nhập
-              </a>
-              <a 
-              href="/auth/register" 
-              className=" text-white font-semibold text-sm transition-all duration-300 bg-[#D9006C] px-4 py-2 rounded-full hover:bg-[#b30056]">
+              </Link>
+              <Link 
+                href="/auth/register" 
+                className="text-white font-semibold text-sm transition-all duration-200 bg-gradient-to-r from-[#D9006C] to-[#FF1A7A] px-5 py-2.5 rounded-full hover:shadow-lg hover:scale-105 active:scale-95"
+              >
                 Đăng kí
-              </a>
-
+              </Link>
             </div>
 
             {/* Search Bar */}
-            <div className="hidden md:flex items-center gap-2 ml-4 bg-[#FFF0F6] rounded-full px-4 py-2">
+            <div className="hidden md:flex items-center gap-2 ml-2 bg-gray-50 hover:bg-gray-100 rounded-full px-4 py-2.5 transition-colors duration-200 border border-gray-200">
               <input
                 type="text"
                 placeholder="Tìm kiếm..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="flex-1 bg-transparent text-sm text-[#1A1A1A] placeholder-[#1A1A1A]/50 focus:outline-none"
+                className="w-32 lg:w-40 bg-transparent text-sm text-gray-700 placeholder-gray-400 focus:outline-none"
               />
               <button
                 onClick={() => {
@@ -66,7 +74,7 @@ export default function Header() {
                     console.log('Search for:', searchQuery);
                   }
                 }}
-                className="p-2 hover:text-[#D9006C] transition-colors duration-300"
+                className="p-1.5 hover:text-[#D9006C] transition-colors duration-200 text-gray-600"
                 aria-label="Search"
               >
                 <svg
@@ -107,12 +115,13 @@ export default function Header() {
             </button>
 
             {/* Cart Icon */}
-            <button
-              className="p-2 hover:text-[#D9006C] transition-colors duration-300"
+            <Link
+              href="/cart"
+              className="relative p-2.5 hover:bg-gray-50 rounded-full transition-all duration-200 text-gray-700 hover:text-[#D9006C] group"
               aria-label="Shopping Cart"
             >
               <svg
-                className="w-5 h-5"
+                className="w-5 h-5 md:w-6 md:h-6 group-hover:scale-110 transition-transform duration-200"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -124,16 +133,19 @@ export default function Header() {
                   d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
                 />
               </svg>
-            </button>
+              {count > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 bg-linear-to-r from-[#D9006C] to-[#FF1A7A] text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center shadow-lg animate-pulse">{count}</span>
+              )}
+            </Link>
 
             {/* Mobile Menu Toggle */}
             <button
-              className="md:hidden p-2"
+              className="md:hidden p-2.5 hover:bg-gray-50 rounded-full transition-colors duration-200"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               aria-label="Toggle menu"
             >
               <svg
-                className="w-5 h-5"
+                className="w-6 h-6 text-gray-700"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -190,29 +202,32 @@ export default function Header() {
 
         {/* Mobile Navigation */}
         {isMenuOpen && (
-          <nav className="md:hidden pb-4 border-t border-[#F0F0F0]">
-            <div className="flex flex-col gap-4 pt-4">
+          <nav className="md:hidden pb-6 pt-4 border-t border-gray-100 bg-white">
+            <div className="flex flex-col gap-1">
               {navItems.map((item) => (
-                <a
-                  key={item}
-                  href={`#${item.toLowerCase().replace(' ', '-')}`}
-                  className="text-[#1A1A1A] font-medium text-sm transition-colors duration-300 hover:text-[#D9006C]"
+                <Link
+                  key={item.label}
+                  href={item.href}
+                  className="px-4 py-3 text-gray-700 font-medium text-base hover:bg-gray-50 hover:text-[#D9006C] rounded-lg transition-all duration-200"
                 >
-                  {item}
-                </a>
+                  {item.label}
+                </Link>
               ))}
               
               {/* Mobile Auth Links */}
-              <div className="border-t border-[#F0F0F0] pt-4 mt-4">
-                <a
+              <div className="border-t border-gray-100 pt-4 mt-4 px-4 space-y-3">
+                <Link
                   href="/auth/login"
-                  className="block text-[#1A1A1A] font-medium text-sm transition-colors duration-300 hover:text-[#D9006C] mb-3"
+                  className="block text-center py-3 text-gray-700 font-semibold border-2 border-gray-300 rounded-full hover:border-[#D9006C] hover:text-[#D9006C] transition-all duration-200"
                 >
                   Đăng nhập
-                </a>
-                <a href="/auth/register" className="w-full block text-center px-4 py-2 bg-[#D9006C] text-white font-semibold rounded-full text-sm transition-all duration-300 hover:bg-[#b30056]">
+                </Link>
+                <Link 
+                  href="/auth/register" 
+                  className="block text-center px-4 py-3 bg-linear-to-r from-[#D9006C] to-[#FF1A7A] text-white font-semibold rounded-full shadow-md hover:shadow-lg active:scale-95 transition-all duration-200"
+                >
                   Đăng kí
-                </a>
+                </Link>
               </div>
             </div>
           </nav>
