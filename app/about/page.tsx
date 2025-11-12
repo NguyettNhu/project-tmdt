@@ -34,8 +34,8 @@ export default function AboutPage() {
     <div className="w-full bg-white overflow-hidden">
 
       {/* Hero */}
-      <section ref={heroRef} className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 via-white to-pink-50">
-        <div className="absolute inset-0 bg-gradient-to-tr from-[#FFE8F4]/30 to-transparent"></div>
+      <section ref={heroRef} className="relative min-h-screen flex items-center justify-center bg-linear-to-br from-gray-50 via-white to-pink-50">
+        <div className="absolute inset-0 bg-linear-to-tr from-[#FFE8F4]/30 to-transparent"></div>
         <div className="absolute top-32 left-10 w-96 h-96 bg-[#D9006C]/10 rounded-full blur-3xl animate-pulse"></div>
         <div className="absolute bottom-20 right-20 w-80 h-80 bg-[#FF1A7A]/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
 
@@ -58,7 +58,7 @@ export default function AboutPage() {
             <motion.span variants={fadeUp}>Câu chuyện</motion.span>
             <br />
             <motion.span
-              className="bg-gradient-to-r from-[#D9006C] via-[#FF1A7A] to-[#FF69B4] bg-clip-text text-transparent"
+              className="bg-linear-to-r from-[#D9006C] via-[#FF1A7A] to-[#FF69B4] bg-clip-text text-transparent"
               variants={fadeUp}
             >
               của chúng tôi
@@ -122,7 +122,7 @@ export default function AboutPage() {
             </motion.div>
 
             <motion.div variants={fadeUp} className="relative h-[700px] rounded-3xl overflow-hidden shadow-2xl group">
-              <div className="absolute inset-0 bg-gradient-to-br from-[#D9006C] to-[#FF69B4] opacity-80 group-hover:opacity-90 transition-opacity"></div>
+              <div className="absolute inset-0 bg-linear-to-br from-[#D9006C] to-[#FF69B4] opacity-80 group-hover:opacity-90 transition-opacity"></div>
               <div className="absolute inset-0 bg-black/20"></div>
               
               <div className="relative h-full flex flex-col justify-between p-12 text-white">
@@ -152,7 +152,7 @@ export default function AboutPage() {
       </section>
 
       {/* Team */}
-      <section ref={teamRef} className="py-32 bg-gradient-to-b from-gray-50 to-white">
+      <section ref={teamRef} className="py-32 bg-linear-to-b from-gray-50 to-white">
         <div className="max-w-7xl mx-auto px-6 lg:px-12">
           <motion.div
             initial="hidden"
@@ -186,7 +186,7 @@ export default function AboutPage() {
                 whileHover={{ y: -12, scale: 1.05 }}
                 className="group relative bg-white rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500"
               >
-                <div className={`absolute inset-0 bg-gradient-to-br ${member.color} opacity-0 group-hover:opacity-20 transition-opacity`}></div>
+                <div className={`absolute inset-0 bg-linear-to-br ${member.color} opacity-0 group-hover:opacity-20 transition-opacity`}></div>
                 <div className="p-10 text-center">
                   <div className="text-4xl mb-6 group-hover:scale-110 transition-transform duration-500">
                     {member.emoji}
@@ -194,7 +194,7 @@ export default function AboutPage() {
                   <h3 className="text-xl font-bold text-gray-900 mb-1">{member.name}</h3>
                   <p className="text-sm text-gray-600">{member.role}</p>
                 </div>
-                <div className="h-2 bg-gradient-to-r from-[#D9006C] to-[#FF1A7A] transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-500"></div>
+                <div className="h-2 bg-linear-to-r from-[#D9006C] to-[#FF1A7A] transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-500"></div>
               </motion.div>
             ))}
           </motion.div>
