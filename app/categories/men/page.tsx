@@ -5,6 +5,7 @@ import Header from '@/components/Header';
 import { products } from '@/lib/products';
 import { FaMars, FaFilter, FaSortAmountDown, FaShoppingBag } from 'react-icons/fa';
 import Image from 'next/image';
+import { Shirt, Wind, Watch, Target } from 'lucide-react';
 
 type SortOption = 'featured' | 'price-low' | 'price-high' | 'name' | 'newest';
 
@@ -109,22 +110,22 @@ export default function MenCategoryPage() {
         {/* Category Banner Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 -mt-8">
           <div className="bg-white rounded-2xl shadow-xl p-6 text-center transform hover:scale-105 transition-transform">
-            <div className="text-3xl mb-2">👔</div>
+            <div className="text-gray-600 mb-2 flex justify-center"><Shirt className="w-8 h-8" /></div>
             <div className="text-sm font-semibold text-gray-700">Áo sơ mi</div>
             <div className="text-xs text-gray-500 mt-1">Lịch sự</div>
           </div>
           <div className="bg-white rounded-2xl shadow-xl p-6 text-center transform hover:scale-105 transition-transform">
-            <div className="text-3xl mb-2">🧥</div>
+            <div className="text-gray-600 mb-2 flex justify-center"><Wind className="w-8 h-8" /></div>
             <div className="text-sm font-semibold text-gray-700">Áo khoác</div>
             <div className="text-xs text-gray-500 mt-1">Nam tính</div>
           </div>
           <div className="bg-white rounded-2xl shadow-xl p-6 text-center transform hover:scale-105 transition-transform">
-            <div className="text-3xl mb-2">👖</div>
+            <div className="text-gray-600 mb-2 flex justify-center"><Shirt className="w-8 h-8" /></div>
             <div className="text-sm font-semibold text-gray-700">Quần & Jeans</div>
             <div className="text-xs text-gray-500 mt-1">Khỏe khoắn</div>
           </div>
           <div className="bg-white rounded-2xl shadow-xl p-6 text-center transform hover:scale-105 transition-transform">
-            <div className="text-3xl mb-2">⌚</div>
+            <div className="text-gray-600 mb-2 flex justify-center"><Watch className="w-8 h-8" /></div>
             <div className="text-sm font-semibold text-gray-700">Phụ kiện</div>
             <div className="text-xs text-gray-500 mt-1">Hoàn thiện</div>
           </div>
@@ -341,7 +342,7 @@ export default function MenCategoryPage() {
 
         {/* Bottom CTA */}
         <div className="mt-12 bg-linear-to-r from-[#1E3A8A] to-[#3B82F6] rounded-2xl shadow-xl p-8 md:p-12 text-center text-white">
-          <div className="text-6xl mb-4">🎯</div>
+          <div className="mb-4 flex justify-center"><Target className="w-16 h-16" /></div>
           <h2 className="text-4xl font-black mb-4">BỘ SƯU TẬP NAM CAO CẤP</h2>
           <p className="text-xl mb-6 max-w-2xl mx-auto opacity-90">
             Khám phá phong cách thời trang nam hiện đại. Mạnh mẽ, lịch lãm và đầy cá tính.

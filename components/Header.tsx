@@ -2,9 +2,11 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useCart } from './CartContext';
 
 export default function Header() {
+  const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -15,7 +17,22 @@ export default function Header() {
     { label: 'Về chúng tôi', href: '/about' },
     { label: 'Liên hệ', href: '/contact' }
   ];
+
   const { count } = useCart();
+
+  const handleSearch = () => {
+    if (searchQuery.trim()) {
+      router.push(`/shop?search=${encodeURIComponent(searchQuery.trim())}`);
+      setSearchQuery('');
+      setIsSearchOpen(false);
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
 
   return (
     <header className="w-full bg-white/95 backdrop-blur-md border-b border-gray-100 sticky top-0 z-50 shadow-sm">
@@ -40,6 +57,9 @@ export default function Header() {
                 <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-[#D9006C] group-hover:w-full transition-all duration-300"></span>
               </Link>
             ))}
+            
+          
+           
           </nav>
 
           {/* Icons - Auth, Cart & Search */}
@@ -67,14 +87,11 @@ export default function Header() {
                 placeholder="Tìm kiếm..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyPress={handleKeyPress}
                 className="w-32 lg:w-40 bg-transparent text-sm text-gray-700 placeholder-gray-400 focus:outline-none"
               />
               <button
-                onClick={() => {
-                  if (searchQuery.trim()) {
-                    console.log('Search for:', searchQuery);
-                  }
-                }}
+                onClick={handleSearch}
                 className="p-1.5 hover:text-[#D9006C] transition-colors duration-200 text-gray-600"
                 aria-label="Search"
               >
@@ -171,15 +188,12 @@ export default function Header() {
                 placeholder="Tìm kiếm..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyPress={handleKeyPress}
                 className="flex-1 bg-transparent text-sm text-[#1A1A1A] placeholder-[#1A1A1A]/50 focus:outline-none"
                 autoFocus
               />
               <button
-                onClick={() => {
-                  if (searchQuery.trim()) {
-                    console.log('Search for:', searchQuery);
-                  }
-                }}
+                onClick={handleSearch}
                 className="p-2 hover:text-[#D9006C] transition-colors duration-300"
                 aria-label="Search"
               >

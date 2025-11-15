@@ -138,7 +138,7 @@ const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-screen bg-linear-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-4 relative overflow-hidden">
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse"></div>
@@ -150,7 +150,7 @@ const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
         <div className="bg-white/10 backdrop-blur-xl rounded-3xl overflow-hidden shadow-2xl border border-white/20">
           <div className="flex flex-col md:flex-row">
             {/* Left side - Illustration */}
-            <div className="hidden md:flex md:w-1/2 bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 p-12 items-center justify-center relative overflow-hidden">
+            <div className="hidden md:flex md:w-1/2 bg-linear-to-br from-indigo-600 via-purple-600 to-pink-600 p-12 items-center justify-center relative overflow-hidden">
               <div className="absolute inset-0 bg-black/10"></div>
               <div className="absolute top-0 left-0 w-96 h-96 bg-white/10 rounded-full blur-3xl"></div>
               <div className="absolute bottom-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl"></div>
@@ -197,9 +197,9 @@ const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
             </div>
 
             {/* Right side - Form */}
-            <div className="w-full md:w-1/2 p-8 md:p-12 bg-gradient-to-br from-gray-900/50 to-gray-800/50">
+            <div className="w-full md:w-1/2 p-8 md:p-12 bg-linear-to-br from-gray-900/50 to-gray-800/50">
               <div className="mb-8">
-                <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent mb-2">
+                <h2 className="text-4xl md:text-5xl font-bold bg-linear-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent mb-2">
                   Create Account
                 </h2>
                 <p className="text-gray-400 text-sm">Sign up to get started</p>
@@ -374,12 +374,12 @@ const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white font-semibold py-4 rounded-xl hover:shadow-lg hover:shadow-purple-500/50 transition-all transform hover:scale-[1.02] active:scale-95 relative overflow-hidden group disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                  className="w-full bg-linear-to-r from-indigo-600 via-purple-600 to-pink-600 text-white font-semibold py-4 rounded-xl hover:shadow-lg hover:shadow-purple-500/50 transition-all transform hover:scale-[1.02] active:scale-95 relative overflow-hidden group disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                 >
                   <span className="relative z-10">
                     {isLoading ? 'Creating Account...' : 'Create Account'}
                   </span>
-                  <div className="absolute inset-0 bg-gradient-to-r from-indigo-700 via-purple-700 to-pink-700 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                  <div className="absolute inset-0 bg-linear-to-r from-indigo-700 via-purple-700 to-pink-700 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 </button>
 
                 {/* Divider */}

@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCart } from './CartContext';
+import { ShoppingBag } from 'lucide-react';
 
 function formatCurrency(n: number) {
   return `$${n.toFixed(2)}`;
@@ -40,7 +41,7 @@ export default function Cart() {
                       // eslint-disable-next-line @next/next/no-img-element
                       <img src={it.image} alt={it.name} className="w-full h-full object-cover" />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center text-2xl">🛍️</div>
+                      <div className="w-full h-full flex items-center justify-center"><ShoppingBag className="w-8 h-8 text-gray-400" /></div>
                     )}
                   </div>
 

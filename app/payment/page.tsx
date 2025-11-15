@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import { useCart } from '@/components/CartContext';
 import Link from 'next/link';
+import { Check, Shirt } from 'lucide-react';
 
 type PaymentMethod = 'credit-card' | 'paypal' | 'cod';
 
@@ -188,12 +189,12 @@ export default function PaymentPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-center gap-4 mb-4">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-white/30 text-white flex items-center justify-center font-bold">✓</div>
+              <div className="w-8 h-8 rounded-full bg-white/30 text-white flex items-center justify-center font-bold"><Check className="w-5 h-5" /></div>
               <span className="text-white/70 font-medium">Giỏ hàng</span>
             </div>
             <div className="w-12 h-0.5 bg-white/50"></div>
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-white/30 text-white flex items-center justify-center font-bold">✓</div>
+              <div className="w-8 h-8 rounded-full bg-white/30 text-white flex items-center justify-center font-bold"><Check className="w-5 h-5" /></div>
               <span className="text-white/70 font-medium">Thông tin giao hàng</span>
             </div>
             <div className="w-12 h-0.5 bg-white"></div>
@@ -430,7 +431,7 @@ export default function PaymentPage() {
                   {items.map((item) => (
                     <div key={item.id} className="flex gap-3">
                       <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center shrink-0">
-                        <span className="text-2xl">👕</span>
+                        <Shirt className="w-8 h-8 text-gray-400" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="font-medium text-gray-900 text-sm truncate">{item.name}</p>

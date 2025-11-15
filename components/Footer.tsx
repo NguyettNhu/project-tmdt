@@ -3,6 +3,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { Check } from "lucide-react";
 
 export default function Footer() {
   const [email, setEmail] = useState("");
@@ -120,6 +121,45 @@ export default function Footer() {
                 </Link>
               </li>
             </ul>
+            
+            {/* Phụ kiện submenu */}
+            <h5 className="font-semibold text-gray-900 mt-6 mb-3 text-sm">
+              Phụ kiện
+            </h5>
+            <ul className="space-y-2">
+              <li>
+                <Link
+                  href="/categories/accessories/shoes"
+                  className="text-sm text-gray-600 hover:text-[#D9006C] transition-colors inline-block"
+                >
+                  Giày dép
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/categories/accessories/hats"
+                  className="text-sm text-gray-600 hover:text-[#D9006C] transition-colors inline-block"
+                >
+                  Mũ
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/categories/accessories/plushies"
+                  className="text-sm text-gray-600 hover:text-[#D9006C] transition-colors inline-block"
+                >
+                  Gấu bông
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/categories/accessories/bags"
+                  className="text-sm text-gray-600 hover:text-[#D9006C] transition-colors inline-block"
+                >
+                  Túi sách
+                </Link>
+              </li>
+            </ul>
           </div>
 
           {/* Column 3 - Hỗ trợ */}
@@ -192,9 +232,10 @@ export default function Footer() {
               </div>
               <button
                 type="submit"
-                className="w-full px-4 py-2.5 bg-[#D9006C] text-white text-sm font-semibold rounded-lg hover:bg-[#B80059] transition-colors duration-300 shadow-sm hover:shadow-md"
+                className="w-full px-4 py-2.5 bg-[#D9006C] text-white text-sm font-semibold rounded-lg hover:bg-[#B80059] transition-colors duration-300 shadow-sm hover:shadow-md flex items-center justify-center gap-2"
               >
-                {isSubscribed ? "✓ Đã đăng ký!" : "Đăng ký ngay"}
+                {isSubscribed && <Check className="w-4 h-4" />}
+                {isSubscribed ? "Đã đăng ký!" : "Đăng ký ngay"}
               </button>
             </form>
             {isSubscribed && (

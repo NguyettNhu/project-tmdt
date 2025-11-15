@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import Link from 'next/link';
+import { Check, Clock, Truck, PartyPopper, Shirt } from 'lucide-react';
 
 type OrderData = {
   orderId: string;
@@ -173,7 +174,7 @@ export default function OrderConfirmationPage() {
             {orderData.items.map((item) => (
               <div key={item.id} className="flex items-center gap-4 pb-4 border-b border-gray-100 last:border-0 last:pb-0">
                 <div className="w-20 h-20 bg-gray-100 rounded-lg flex items-center justify-center shrink-0">
-                  <span className="text-3xl">👕</span>
+                  <Shirt className="w-10 h-10 text-gray-400" />
                 </div>
                 <div className="flex-1">
                   <h3 className="font-semibold text-gray-900 mb-1">{item.name}</h3>
@@ -214,19 +215,21 @@ export default function OrderConfirmationPage() {
             {/* Timeline */}
             <div className="flex items-start justify-between">
               {[
-                { label: 'Đã đặt hàng', icon: '✓', status: 'completed', date: orderDate.toLocaleDateString('vi-VN') },
-                { label: 'Đang xử lý', icon: '⏳', status: 'current' },
-                { label: 'Đang giao', icon: '🚚', status: 'pending' },
-                { label: 'Hoàn thành', icon: '🎉', status: 'pending' }
-              ].map((step, index) => (
-                <div key={index} className="flex flex-col items-center relative flex-1">
-                  <div className={`w-12 h-12 rounded-full flex items-center justify-center text-xl mb-2 ${
-                    step.status === 'completed' ? 'bg-green-100' :
-                    step.status === 'current' ? 'bg-[#FFF0F6] border-2 border-[#D9006C]' :
-                    'bg-gray-100'
-                  }`}>
-                    {step.icon}
-                  </div>
+                { label: 'Đã đặt hàng', IconComponent: Check, status: 'completed', date: orderDate.toLocaleDateString('vi-VN') },
+                { label: 'Đang xử lý', IconComponent: Clock, status: 'current' },
+                { label: 'Đang giao', IconComponent: Truck, status: 'pending' },
+                { label: 'Hoàn thành', IconComponent: PartyPopper, status: 'pending' }
+              ].map((step, index) => {
+                const IconComponent = step.IconComponent;
+                return (
+                  <div key={index} className="flex flex-col items-center relative flex-1">
+                    <div className={`w-12 h-12 rounded-full flex items-center justify-center text-xl mb-2 ${
+                      step.status === 'completed' ? 'bg-green-100' :
+                      step.status === 'current' ? 'bg-[#FFF0F6] border-2 border-[#D9006C]' :
+                      'bg-gray-100'
+                    }`}>
+                      <IconComponent className="w-6 h-6" />
+                    </div>
                   <p className={`text-sm font-semibold text-center ${
                     step.status === 'completed' || step.status === 'current' ? 'text-gray-900' : 'text-gray-400'
                   }`}>
@@ -241,7 +244,8 @@ export default function OrderConfirmationPage() {
                     }`} style={{ transform: 'translateY(-50%)' }}></div>
                   )}
                 </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </div>

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Header from '@/components/Header';
 import { FaUndo, FaCheckCircle, FaTimesCircle, FaShippingFast, FaMoneyBillWave, FaExchangeAlt, FaClipboardList, FaClock, FaBox } from 'react-icons/fa';
+import { Check } from 'lucide-react';
 
 export default function ReturnsPage() {
   const [activeSection, setActiveSection] = useState<string>('overview');
@@ -447,19 +448,19 @@ export default function ReturnsPage() {
                     </div>
                     <ul className="space-y-2 text-gray-700">
                       <li className="flex items-start">
-                        <span className="text-green-600 mr-2">✓</span>
+                        <Check className="w-5 h-5 text-green-600 mr-2 flex-shrink-0" />
                         <span>Sản phẩm lỗi từ nhà sản xuất</span>
                       </li>
                       <li className="flex items-start">
-                        <span className="text-green-600 mr-2">✓</span>
+                        <Check className="w-5 h-5 text-green-600 mr-2 flex-shrink-0" />
                         <span>Giao sai sản phẩm</span>
                       </li>
                       <li className="flex items-start">
-                        <span className="text-green-600 mr-2">✓</span>
+                        <Check className="w-5 h-5 text-green-600 mr-2 flex-shrink-0" />
                         <span>Đổi size/màu lần đầu tiên</span>
                       </li>
                       <li className="flex items-start">
-                        <span className="text-green-600 mr-2">✓</span>
+                        <Check className="w-5 h-5 text-green-600 mr-2 flex-shrink-0" />
                         <span>Đơn hàng trên 2.000.000đ</span>
                       </li>
                     </ul>

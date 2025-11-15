@@ -336,9 +336,315 @@ export const products: Product[] = [
     inStock: true
   },
   
-  // Accessories
+  // Shoes - Giày dép
   {
     id: 29,
+    name: 'Classic White Sneakers',
+    price: 89.99,
+    image: '/images/product-1.svg',
+    description: 'Versatile white sneakers perfect for everyday wear.',
+    category: 'Shoes',
+    colors: ['White', 'Off-White'],
+    sizes: ['36', '37', '38', '39', '40', '41', '42', '43'],
+    inStock: true,
+    featured: true
+  },
+  {
+    id: 30,
+    name: 'Running Shoes Sport',
+    price: 119.99,
+    image: '/images/product-1.svg',
+    description: 'Lightweight running shoes with cushioned sole.',
+    category: 'Shoes',
+    colors: ['Black', 'Blue', 'Red'],
+    sizes: ['38', '39', '40', '41', '42', '43'],
+    inStock: true
+  },
+  {
+    id: 31,
+    name: 'Leather Loafers',
+    price: 129.99,
+    image: '/images/product-1.svg',
+    description: 'Elegant leather loafers for formal occasions.',
+    category: 'Shoes',
+    colors: ['Black', 'Brown'],
+    sizes: ['38', '39', '40', '41', '42', '43'],
+    inStock: true
+  },
+  {
+    id: 32,
+    name: 'Canvas Slip-On',
+    price: 59.99,
+    image: '/images/product-1.svg',
+    description: 'Casual slip-on shoes for relaxed style.',
+    category: 'Shoes',
+    colors: ['Navy', 'Gray', 'Black'],
+    sizes: ['36', '37', '38', '39', '40', '41'],
+    inStock: true
+  },
+  {
+    id: 33,
+    name: 'High-Top Sneakers',
+    price: 99.99,
+    image: '/images/product-1.svg',
+    description: 'Trendy high-top sneakers with ankle support.',
+    category: 'Shoes',
+    colors: ['Black', 'White', 'Red'],
+    sizes: ['38', '39', '40', '41', '42'],
+    inStock: true
+  },
+  {
+    id: 34,
+    name: 'Chelsea Boots',
+    price: 159.99,
+    image: '/images/product-1.svg',
+    description: 'Classic Chelsea boots in premium leather.',
+    category: 'Shoes',
+    colors: ['Black', 'Brown'],
+    sizes: ['39', '40', '41', '42', '43'],
+    inStock: true
+  },
+  {
+    id: 35,
+    name: 'Sandals Summer',
+    price: 49.99,
+    image: '/images/product-1.svg',
+    description: 'Comfortable sandals for summer days.',
+    category: 'Shoes',
+    colors: ['Brown', 'Black', 'Tan'],
+    sizes: ['38', '39', '40', '41', '42'],
+    inStock: true
+  },
+  
+  // Hats - Mũ
+  {
+    id: 36,
+    name: 'Baseball Cap Classic',
+    price: 24.99,
+    image: '/images/product-1.svg',
+    description: 'Classic baseball cap with adjustable strap.',
+    category: 'Hats',
+    colors: ['Black', 'Navy', 'White', 'Red'],
+    inStock: true,
+    featured: true
+  },
+  {
+    id: 37,
+    name: 'Beanie Winter',
+    price: 19.99,
+    image: '/images/product-1.svg',
+    description: 'Cozy beanie for cold weather.',
+    category: 'Hats',
+    colors: ['Black', 'Gray', 'Navy', 'Burgundy'],
+    inStock: true
+  },
+  {
+    id: 38,
+    name: 'Bucket Hat',
+    price: 29.99,
+    image: '/images/product-1.svg',
+    description: 'Trendy bucket hat for sun protection.',
+    category: 'Hats',
+    colors: ['Khaki', 'Black', 'White'],
+    inStock: true
+  },
+  {
+    id: 39,
+    name: 'Snapback Cap',
+    price: 27.99,
+    image: '/images/product-1.svg',
+    description: 'Urban style snapback with flat brim.',
+    category: 'Hats',
+    colors: ['Black', 'Navy', 'Gray'],
+    inStock: true
+  },
+  {
+    id: 40,
+    name: 'Fedora Hat',
+    price: 39.99,
+    image: '/images/product-1.svg',
+    description: 'Classic fedora for sophisticated look.',
+    category: 'Hats',
+    colors: ['Black', 'Gray', 'Brown'],
+    inStock: true
+  },
+  {
+    id: 41,
+    name: 'Trucker Cap',
+    price: 22.99,
+    image: '/images/product-1.svg',
+    description: 'Breathable trucker cap with mesh back.',
+    category: 'Hats',
+    colors: ['Black/White', 'Navy/White', 'Red/White'],
+    inStock: true
+  },
+  
+  // Plushies - Gấu bông
+  {
+    id: 42,
+    name: 'Classic Teddy Bear',
+    price: 34.99,
+    image: '/images/product-1.svg',
+    description: 'Soft and cuddly classic teddy bear.',
+    category: 'Plushies',
+    colors: ['Brown', 'White', 'Pink'],
+    sizes: ['Small', 'Medium', 'Large'],
+    inStock: true,
+    featured: true
+  },
+  {
+    id: 43,
+    name: 'Bunny Plush',
+    price: 29.99,
+    image: '/images/product-1.svg',
+    description: 'Adorable bunny plush with floppy ears.',
+    category: 'Plushies',
+    colors: ['White', 'Gray', 'Pink'],
+    sizes: ['Small', 'Medium'],
+    inStock: true
+  },
+  {
+    id: 44,
+    name: 'Panda Bear Plush',
+    price: 39.99,
+    image: '/images/product-1.svg',
+    description: 'Cute panda bear with black and white fur.',
+    category: 'Plushies',
+    colors: ['Black/White'],
+    sizes: ['Medium', 'Large'],
+    inStock: true
+  },
+  {
+    id: 45,
+    name: 'Unicorn Plush',
+    price: 44.99,
+    image: '/images/product-1.svg',
+    description: 'Magical unicorn plush with rainbow mane.',
+    category: 'Plushies',
+    colors: ['White', 'Pink', 'Purple'],
+    sizes: ['Medium', 'Large'],
+    inStock: true
+  },
+  {
+    id: 46,
+    name: 'Elephant Plush',
+    price: 36.99,
+    image: '/images/product-1.svg',
+    description: 'Gentle elephant plush with soft trunk.',
+    category: 'Plushies',
+    colors: ['Gray', 'Blue'],
+    sizes: ['Small', 'Medium', 'Large'],
+    inStock: true
+  },
+  {
+    id: 47,
+    name: 'Kitty Cat Plush',
+    price: 32.99,
+    image: '/images/product-1.svg',
+    description: 'Sweet kitty cat plush with fluffy tail.',
+    category: 'Plushies',
+    colors: ['Orange', 'Gray', 'White'],
+    sizes: ['Small', 'Medium'],
+    inStock: true
+  },
+  {
+    id: 48,
+    name: 'Dinosaur Plush',
+    price: 38.99,
+    image: '/images/product-1.svg',
+    description: 'Friendly dinosaur plush for kids.',
+    category: 'Plushies',
+    colors: ['Green', 'Blue', 'Purple'],
+    sizes: ['Medium', 'Large'],
+    inStock: true
+  },
+  
+  // Bags - Túi sách
+  {
+    id: 49,
+    name: 'Canvas Tote Bag',
+    price: 29.99,
+    image: '/images/product-1.svg',
+    description: 'Durable canvas tote for daily use.',
+    category: 'Bags',
+    colors: ['Natural', 'Black', 'Navy'],
+    inStock: true,
+    featured: true
+  },
+  {
+    id: 50,
+    name: 'Leather Crossbody',
+    price: 79.99,
+    image: '/images/product-1.svg',
+    description: 'Elegant leather crossbody bag.',
+    category: 'Bags',
+    colors: ['Black', 'Brown', 'Tan'],
+    inStock: true
+  },
+  {
+    id: 51,
+    name: 'Backpack Urban',
+    price: 89.99,
+    image: '/images/product-1.svg',
+    description: 'Modern backpack with laptop compartment.',
+    category: 'Bags',
+    colors: ['Black', 'Gray', 'Navy'],
+    inStock: true
+  },
+  {
+    id: 52,
+    name: 'Mini Shoulder Bag',
+    price: 54.99,
+    image: '/images/product-1.svg',
+    description: 'Compact shoulder bag for essentials.',
+    category: 'Bags',
+    colors: ['Black', 'Pink', 'White'],
+    inStock: true
+  },
+  {
+    id: 53,
+    name: 'Messenger Bag',
+    price: 69.99,
+    image: '/images/product-1.svg',
+    description: 'Professional messenger bag with multiple pockets.',
+    category: 'Bags',
+    colors: ['Brown', 'Black'],
+    inStock: true
+  },
+  {
+    id: 54,
+    name: 'Gym Duffle Bag',
+    price: 59.99,
+    image: '/images/product-1.svg',
+    description: 'Spacious duffle bag for gym and travel.',
+    category: 'Bags',
+    colors: ['Black', 'Navy', 'Gray'],
+    inStock: true
+  },
+  {
+    id: 55,
+    name: 'Clutch Evening Bag',
+    price: 49.99,
+    image: '/images/product-1.svg',
+    description: 'Elegant clutch for evening events.',
+    category: 'Bags',
+    colors: ['Black', 'Gold', 'Silver'],
+    inStock: true
+  },
+  {
+    id: 56,
+    name: 'Travel Backpack Large',
+    price: 119.99,
+    image: '/images/product-1.svg',
+    description: 'Large travel backpack with wheels.',
+    category: 'Bags',
+    colors: ['Black', 'Gray'],
+    inStock: true
+  },
+  
+  // Keep old Accessories for backward compatibility
+  {
+    id: 57,
     name: 'Leather Belt',
     price: 39.99,
     image: '/images/product-1.svg',
@@ -346,36 +652,6 @@ export const products: Product[] = [
     category: 'Accessories',
     colors: ['Black', 'Brown'],
     sizes: ['S', 'M', 'L'],
-    inStock: true
-  },
-  {
-    id: 30,
-    name: 'Canvas Tote Bag',
-    price: 29.99,
-    image: '/images/product-1.svg',
-    description: 'Durable canvas tote for daily use.',
-    category: 'Accessories',
-    colors: ['Natural', 'Black', 'Navy'],
-    inStock: true
-  },
-  {
-    id: 31,
-    name: 'Baseball Cap',
-    price: 24.99,
-    image: '/images/product-1.svg',
-    description: 'Classic baseball cap with adjustable strap.',
-    category: 'Accessories',
-    colors: ['Black', 'Navy', 'White'],
-    inStock: true
-  },
-  {
-    id: 32,
-    name: 'Beanie Hat',
-    price: 19.99,
-    image: '/images/product-1.svg',
-    description: 'Cozy beanie for cold weather.',
-    category: 'Accessories',
-    colors: ['Black', 'Gray', 'Navy'],
     inStock: true
   },
 ];

@@ -5,6 +5,7 @@ import Header from '@/components/Header';
 import { products } from '@/lib/products';
 import { FaStar, FaFilter, FaSortAmountDown, FaShoppingBag, FaClock, FaBolt } from 'react-icons/fa';
 import Image from 'next/image';
+import { Check, X } from 'lucide-react';
 
 type SortOption = 'newest' | 'price-low' | 'price-high' | 'name' | 'popular';
 
@@ -378,12 +379,12 @@ export default function NewArrivalsPage() {
                         {product.inStock !== undefined && (
                           <div className="mb-4">
                             {product.inStock ? (
-                              <span className="text-xs font-semibold text-green-600 bg-green-50 px-3 py-1 rounded-full">
-                                ✓ Còn hàng
+                              <span className="text-xs font-semibold text-green-600 bg-green-50 px-3 py-1 rounded-full inline-flex items-center gap-1">
+                                <Check className="w-3 h-3" /> Còn hàng
                               </span>
                             ) : (
-                              <span className="text-xs font-semibold text-red-600 bg-red-50 px-3 py-1 rounded-full">
-                                ✗ Hết hàng
+                              <span className="text-xs font-semibold text-red-600 bg-red-50 px-3 py-1 rounded-full inline-flex items-center gap-1">
+                                <X className="w-3 h-3" /> Hết hàng
                               </span>
                             )}
                           </div>

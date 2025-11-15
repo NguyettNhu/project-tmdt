@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react';
 import Header from '@/components/Header';
 import { products } from '@/lib/products';
 import { FaVenusMars, FaFilter, FaSortAmountDown, FaShoppingBag } from 'react-icons/fa';
+import { Shirt, ShoppingBag, Gem } from 'lucide-react';
 import Image from 'next/image';
 
 type SortOption = 'featured' | 'price-low' | 'price-high' | 'name' | 'newest';
@@ -110,22 +111,22 @@ export default function WomenCategoryPage() {
         {/* Category Banner Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 -mt-8">
           <div className="bg-white rounded-2xl shadow-xl p-6 text-center transform hover:scale-105 transition-transform">
-            <div className="text-3xl mb-2">👗</div>
+            <div className="text-gray-600 mb-2 flex justify-center"><Shirt className="w-8 h-8" /></div>
             <div className="text-sm font-semibold text-gray-700">Váy & Đầm</div>
             <div className="text-xs text-gray-500 mt-1">Thanh lịch</div>
           </div>
           <div className="bg-white rounded-2xl shadow-xl p-6 text-center transform hover:scale-105 transition-transform">
-            <div className="text-3xl mb-2">👚</div>
+            <div className="text-gray-600 mb-2 flex justify-center"><Shirt className="w-8 h-8" /></div>
             <div className="text-sm font-semibold text-gray-700">Áo & Tops</div>
             <div className="text-xs text-gray-500 mt-1">Trẻ trung</div>
           </div>
           <div className="bg-white rounded-2xl shadow-xl p-6 text-center transform hover:scale-105 transition-transform">
-            <div className="text-3xl mb-2">👖</div>
+            <div className="text-gray-600 mb-2 flex justify-center"><Shirt className="w-8 h-8" /></div>
             <div className="text-sm font-semibold text-gray-700">Quần & Jeans</div>
             <div className="text-xs text-gray-500 mt-1">Năng động</div>
           </div>
           <div className="bg-white rounded-2xl shadow-xl p-6 text-center transform hover:scale-105 transition-transform">
-            <div className="text-3xl mb-2">👜</div>
+            <div className="text-gray-600 mb-2 flex justify-center"><ShoppingBag className="w-8 h-8" /></div>
             <div className="text-sm font-semibold text-gray-700">Phụ kiện</div>
             <div className="text-xs text-gray-500 mt-1">Hoàn thiện</div>
           </div>
@@ -342,7 +343,7 @@ export default function WomenCategoryPage() {
 
         {/* Bottom CTA */}
         <div className="mt-12 bg-linear-to-r from-[#D9006C] to-[#FF1A7A] rounded-2xl shadow-xl p-8 md:p-12 text-center text-white">
-          <div className="text-6xl mb-4">💎</div>
+          <div className="mb-4 flex justify-center"><Gem className="w-16 h-16" /></div>
           <h2 className="text-4xl font-black mb-4">BỘ SƯU TẬP NỮ CAO CẤP</h2>
           <p className="text-xl mb-6 max-w-2xl mx-auto opacity-90">
             Khám phá những xu hướng thời trang mới nhất dành cho phái đẹp. Phong cách hiện đại, chất lượng cao cấp.
