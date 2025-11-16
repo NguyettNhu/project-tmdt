@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Star, Upload, X } from 'lucide-react';
 import Image from 'next/image';
+import { toast } from 'sonner';
 
 interface ReviewFormProps {
   productId: number;
@@ -44,12 +45,12 @@ export default function ReviewForm({ productId, onSubmit }: ReviewFormProps) {
     e.preventDefault();
     
     if (rating === 0) {
-      alert('Vui lòng chọn số sao đánh giá');
+      toast.error('Vui lòng chọn số sao đánh giá');
       return;
     }
 
     if (comment.trim().length < 10) {
-      alert('Vui lòng viết đánh giá ít nhất 10 ký tự');
+      toast.error('Vui lòng viết đánh giá ít nhất 10 ký tự');
       return;
     }
 
@@ -265,7 +266,7 @@ export default function ReviewForm({ productId, onSubmit }: ReviewFormProps) {
       <button
         type="submit"
         disabled={isSubmitting || rating === 0}
-        className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold py-4 rounded-xl hover:from-purple-700 hover:to-pink-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all transform hover:scale-[1.02] active:scale-[0.98]"
+        className="w-full bg-linear-to-r from-purple-600 to-pink-600 text-white font-bold py-4 rounded-xl hover:from-purple-700 hover:to-pink-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all transform hover:scale-[1.02] active:scale-[0.98]"
       >
         {isSubmitting ? 'Đang gửi...' : 'Gửi đánh giá'}
       </button>

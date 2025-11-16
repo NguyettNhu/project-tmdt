@@ -6,6 +6,7 @@ import Header from '@/components/Header';
 import { useCart } from '@/components/CartContext';
 import Link from 'next/link';
 import { Check, Shirt } from 'lucide-react';
+import { toast } from 'sonner';
 
 type PaymentMethod = 'credit-card' | 'paypal' | 'cod';
 
@@ -121,12 +122,14 @@ export default function PaymentPage() {
 
   const handleSubmitPayment = async () => {
     if (!agreeTerms) {
-      alert('Vui lòng đồng ý với điều khoản dịch vụ');
+      toast.error('Vui lòng đồng ý với điều khoản dịch vụ');
       return;
     }
 
     if (items.length === 0) {
-      alert('Giỏ hàng trống!');
+      toast.error('Giỏ hàng trống!', {
+        description: 'Vui lòng thêm sản phẩm trước khi thanh toán',
+      });
       router.push('/cart');
       return;
     }

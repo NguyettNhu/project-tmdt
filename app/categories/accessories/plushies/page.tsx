@@ -58,7 +58,7 @@ export default function PlushiesPage() {
           </p>
           <select
             value={sortBy}
-            onChange={(e) => setSortBy(e.target.value as any)}
+            onChange={(e) => setSortBy(e.target.value as 'featured' | 'price-low' | 'price-high' | 'name')}
             className="px-4 py-2 border-2 border-gray-200 rounded-xl focus:border-[#EC4899] focus:outline-none transition-colors font-medium"
           >
             <option value="featured">Nổi bật</option>

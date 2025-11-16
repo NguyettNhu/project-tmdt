@@ -117,7 +117,7 @@ export default function ReviewSection({ productId }: ReviewSectionProps) {
           {/* Rating Overview */}
           <div className="grid md:grid-cols-2 gap-8 mb-8">
             {/* Overall Rating */}
-            <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-8 border border-purple-100">
+            <div className="bg-linear-to-br from-purple-50 to-pink-50 rounded-2xl p-8 border border-purple-100">
               <div className="text-center">
                 <div className="text-6xl font-black text-gray-900 mb-2">
                   {stats.averageRating.toFixed(1)}
@@ -149,7 +149,7 @@ export default function ReviewSection({ productId }: ReviewSectionProps) {
             {!showReviewForm && (
               <button
                 onClick={() => setShowReviewForm(true)}
-                className="w-full md:w-auto px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold rounded-xl hover:from-purple-700 hover:to-pink-700 transition-all transform hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2"
+                className="w-full md:w-auto px-8 py-4 bg-linear-to-r from-purple-600 to-pink-600 text-white font-bold rounded-xl hover:from-purple-700 hover:to-pink-700 transition-all transform hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2"
               >
                 <MessageSquare className="w-5 h-5" />
                 Viết đánh giá của bạn
@@ -194,7 +194,7 @@ export default function ReviewSection({ productId }: ReviewSectionProps) {
 
             <select
               value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as any)}
+              onChange={(e) => setSortBy(e.target.value as 'recent' | 'helpful' | 'highest' | 'lowest')}
               className="px-4 py-2 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none transition-colors font-medium text-sm"
             >
               <option value="recent">Mới nhất</option>
@@ -227,7 +227,7 @@ export default function ReviewSection({ productId }: ReviewSectionProps) {
       ) : (
         <>
           {/* No Reviews Yet */}
-          <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-12 text-center border border-purple-100 mb-8">
+          <div className="bg-linear-to-br from-purple-50 to-pink-50 rounded-2xl p-12 text-center border border-purple-100 mb-8">
             <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm">
               <MessageSquare className="w-10 h-10 text-purple-500" />
             </div>
@@ -240,7 +240,7 @@ export default function ReviewSection({ productId }: ReviewSectionProps) {
             {!showReviewForm && (
               <button
                 onClick={() => setShowReviewForm(true)}
-                className="px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold rounded-xl hover:from-purple-700 hover:to-pink-700 transition-all transform hover:scale-[1.02] active:scale-[0.98]"
+                className="px-8 py-4 bg-linear-to-r from-purple-600 to-pink-600 text-white font-bold rounded-xl hover:from-purple-700 hover:to-pink-700 transition-all transform hover:scale-[1.02] active:scale-[0.98]"
               >
                 Viết đánh giá đầu tiên
               </button>

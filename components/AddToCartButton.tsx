@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { useCart } from './CartContext';
+import { toast } from 'sonner';
 
 type Props = {
   id: number;
@@ -15,12 +16,9 @@ export default function AddToCartButton({ id, name, price, image }: Props) {
 
   const handleAdd = () => {
     addItem({ id, name, price, image });
-    // lightweight feedback
-    try {
-      // small non-blocking notification
-      // keep as alert for now to be explicit
-      alert('Đã thêm vào giỏ hàng');
-    } catch {}
+    toast.success('Đã thêm vào giỏ hàng', {
+      description: name,
+    });
   };
 
   return (

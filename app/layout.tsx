@@ -5,6 +5,7 @@ import "./globals.css";
 import { CartProvider } from "@/components/CartContext";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
+import { Toaster } from "sonner";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -41,6 +42,7 @@ export default function RootLayout({
           
           {/* Footer - always at bottom */}
           <Footer />
+          <Toaster position="bottom-right" richColors closeButton />
         </CartProvider>
       </body>
     </html>

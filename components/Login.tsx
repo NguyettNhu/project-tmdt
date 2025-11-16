@@ -1,14 +1,19 @@
 'use client';
 
 import React, { useState } from 'react';
+import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
+import { loginUser, saveCurrentUser } from '@/lib/auth';
 
 const ImprovedLogin: React.FC = () => {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     username: '',
     password: '',
     rememberMe: false
   });
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -18,9 +23,40 @@ const ImprovedLogin: React.FC = () => {
     });
   };
 
-  const handleSubmit = () => {
-    console.log('Login:', formData);
-    alert('Login successful!');
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!formData.username || !formData.password) {
+      toast.error('Vui lòng nhập đầy đủ thông tin');
+      return;
+    }
+
+    setIsLoading(true);
+
+    // Simulate API call
+    setTimeout(() => {
+      const user = loginUser(formData.username, formData.password);
+      
+      if (user) {
+        saveCurrentUser(user);
+        toast.success('Đăng nhập thành công!', {
+          description: `Chào mừng ${user.fullName} - ${user.role === 'buyer' ? 'Người mua' : 'Người bán'}`,
+        });
+        
+        // Redirect based on role
+        if (user.role === 'seller') {
+          router.push('/shop'); // Seller dashboard (có thể tạo trang riêng sau)
+        } else {
+          router.push('/');
+        }
+      } else {
+        toast.error('Đăng nhập thất bại', {
+          description: 'Email/Username hoặc mật khẩu không đúng',
+        });
+      }
+      
+      setIsLoading(false);
+    }, 800);
   };
 
   return (
@@ -129,9 +165,10 @@ const ImprovedLogin: React.FC = () => {
                 {/* Sign In Button */}
                 <button
                   onClick={handleSubmit}
-                  className="w-full bg-linear-to-r from-purple-500 to-pink-500 text-white font-extrabold text-lg py-4 md:py-5 rounded-3xl hover:from-purple-600 hover:to-pink-600 transform hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 shadow-2xl shadow-pink-500/30"
+                  disabled={isLoading}
+                  className="w-full bg-linear-to-r from-purple-500 to-pink-500 text-white font-extrabold text-lg py-4 md:py-5 rounded-3xl hover:from-purple-600 hover:to-pink-600 transform hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 shadow-2xl shadow-pink-500/30 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                 >
-                  Sign In
+                  {isLoading ? 'Đang đăng nhập...' : 'Sign In'}
                 </button>
 
                 {/* Divider */}
@@ -185,9 +222,9 @@ const ImprovedLogin: React.FC = () => {
               <div className="absolute top-10 right-10 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
               <div className="absolute bottom-10 left-10 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
               
-              <div className="relative z-10 text-center">
+              <div className="relative z-10 w-full">
                 {/* Icon */}
-                <div className="mb-10">
+                <div className="mb-10 text-center">
                   <div className="w-36 h-36 mx-auto bg-white/20 backdrop-blur-xl rounded-3xl flex items-center justify-center shadow-2xl border-4 border-white/30">
                     <svg className="w-20 h-20 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -196,24 +233,52 @@ const ImprovedLogin: React.FC = () => {
                 </div>
 
                 {/* Text */}
-                <h2 className="text-6xl font-extrabold text-white mb-6 leading-tight">
-                  Welcome Back!
-                </h2>
-                <p className="text-xl text-white/90 leading-relaxed max-w-md mx-auto mb-8">
-                  Access your account and continue your journey with us.
-                </p>
-                <p className="text-lg text-white/80 font-medium">
-                  We&apos;re glad to have you back!
-                </p>
+                <div className="text-center mb-8">
+                  <h2 className="text-5xl font-extrabold text-white mb-4 leading-tight">
+                    Welcome Back!
+                  </h2>
+                  <p className="text-lg text-white/90 mb-8">
+                    Access your account and continue your journey
+                  </p>
+                </div>
+                
+                {/* Demo Accounts */}
+                <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/20 mb-8">
+                  <h3 className="text-white font-bold text-lg mb-4 text-center">🔑 Tài khoản demo</h3>
+                  
+                  <div className="space-y-3 text-left">
+                    {/* Buyer Account */}
+                    <div className="bg-white/10 rounded-xl p-4 border border-white/20">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="text-green-300 font-bold">👤 NGƯỜI MUA</span>
+                      </div>
+                      <div className="text-white/90 text-sm space-y-1">
+                        <p>Email: <span className="font-mono bg-white/20 px-2 py-0.5 rounded">buyer@example.com</span></p>
+                        <p>Pass: <span className="font-mono bg-white/20 px-2 py-0.5 rounded">123456</span></p>
+                      </div>
+                    </div>
+                    
+                    {/* Seller Account */}
+                    <div className="bg-white/10 rounded-xl p-4 border border-white/20">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="text-blue-300 font-bold">🏪 NGƯỜI BÁN</span>
+                      </div>
+                      <div className="text-white/90 text-sm space-y-1">
+                        <p>Email: <span className="font-mono bg-white/20 px-2 py-0.5 rounded">seller@example.com</span></p>
+                        <p>Pass: <span className="font-mono bg-white/20 px-2 py-0.5 rounded">123456</span></p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
 
                 {/* Features */}
-                <div className="mt-12 space-y-4">
-                  {['Secure authentication', 'Fast & reliable', '24/7 support'].map((feature, index) => (
+                <div className="space-y-3">
+                  {['Secure authentication', 'Role-based access'].map((feature, index) => (
                     <div key={index} className="flex items-center justify-center gap-3 text-white/90">
-                      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" />
                       </svg>
-                      <span className="text-lg font-medium">{feature}</span>
+                      <span className="text-sm font-medium">{feature}</span>
                     </div>
                   ))}
                 </div>

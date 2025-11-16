@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCart } from './CartContext';
 import { ShoppingBag } from 'lucide-react';
+import { toast } from 'sonner';
 
 function formatCurrency(n: number) {
   return `$${n.toFixed(2)}`;
@@ -15,7 +16,9 @@ export default function Cart() {
 
   const handleCheckout = () => {
     if (items.length === 0) {
-      alert('Giỏ hàng đang trống.');
+      toast.error('Giỏ hàng đang trống', {
+        description: 'Vui lòng thêm sản phẩm trước khi thanh toán',
+      });
       return;
     }
     router.push('/shipping');

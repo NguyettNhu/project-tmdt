@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from 'react';
+import { toast } from 'sonner';
 
 interface RegisterFormData {
   username: string;
@@ -114,7 +115,9 @@ const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
         email: formData.email
       });
       
-      alert('Registration successful! Please check your email to verify your account.');
+      toast.success('Đăng ký thành công!', {
+        description: 'Vui lòng kiểm tra email để xác thực tài khoản',
+      });
       
       // Reset form
       setFormData({
@@ -126,7 +129,9 @@ const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
       });
     } catch (error) {
       console.error('Registration error:', error);
-      alert('Registration failed. Please try again.');
+      toast.error('Đăng ký thất bại', {
+        description: 'Vui lòng thử lại',
+      });
     } finally {
       setIsLoading(false);
     }
@@ -134,7 +139,9 @@ const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
 
   const handleSocialRegister = (provider: string) => {
     console.log(`Register with ${provider}`);
-    alert(`${provider} registration will be implemented`);
+    toast.info(`Đăng ký với ${provider}`, {
+      description: 'Tính năng đang được phát triển',
+    });
   };
 
   return (

@@ -1,15 +1,18 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCart } from './CartContext';
+import { getCurrentUser, type User } from '@/lib/auth';
+import { User as UserIcon } from 'lucide-react';
 
 export default function Header() {
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
 
   const navItems = [
     { label: 'Trang chủ', href: '/' },
@@ -19,6 +22,13 @@ export default function Header() {
   ];
 
   const { count } = useCart();
+
+  useEffect(() => {
+    const loadUser = () => {
+      setUser(getCurrentUser());
+    };
+    loadUser();
+  }, []);
 
   const handleSearch = () => {
     if (searchQuery.trim()) {
@@ -64,20 +74,32 @@ export default function Header() {
 
           {/* Icons - Auth, Cart & Search */}
           <div className="flex items-center gap-2 md:gap-4">
-            {/* Login & Register - Desktop */}
-            <div className="hidden lg:flex items-center gap-6">
-              <Link
-                href="/auth/login"
-                className="text-gray-700 font-medium text-sm hover:text-[#D9006C] transition-colors duration-200"
-              >
-                Đăng nhập
-              </Link>
-              <Link 
-                href="/auth/register" 
-                className="text-white font-semibold text-sm transition-all duration-200 bg-linear-to-r from-[#D9006C] to-[#FF1A7A] px-5 py-2.5 rounded-full hover:shadow-lg hover:scale-105 active:scale-95"
-              >
-                Đăng kí
-              </Link>
+            {/* Login & Register / User Profile - Desktop */}
+            <div className="hidden lg:flex items-center gap-4">
+              {user ? (
+                <Link
+                  href="/profile"
+                  className="flex items-center gap-2 px-4 py-2 rounded-full bg-linear-to-r from-purple-100 to-pink-100 hover:from-purple-200 hover:to-pink-200 transition-all duration-200"
+                >
+                  <UserIcon className="w-5 h-5 text-purple-700" />
+                  <span className="text-gray-900 font-semibold text-sm">{user.fullName}</span>
+                </Link>
+              ) : (
+                <>
+                  <Link
+                    href="/auth/login"
+                    className="text-gray-700 font-medium text-sm hover:text-[#D9006C] transition-colors duration-200"
+                  >
+                    Đăng nhập
+                  </Link>
+                  <Link 
+                    href="/auth/register" 
+                    className="text-white font-semibold text-sm transition-all duration-200 bg-linear-to-r from-[#D9006C] to-[#FF1A7A] px-5 py-2.5 rounded-full hover:shadow-lg hover:scale-105 active:scale-95"
+                  >
+                    Đăng kí
+                  </Link>
+                </>
+              )}
             </div>
 
             {/* Search Bar */}

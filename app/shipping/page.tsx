@@ -6,6 +6,7 @@ import Header from '@/components/Header';
 import { useCart } from '@/components/CartContext';
 import Link from 'next/link';
 import { Shirt } from 'lucide-react';
+import { toast } from 'sonner';
 
 type ShippingMethod = {
   id: string;
@@ -95,7 +96,9 @@ export default function ShippingPage() {
     e.preventDefault();
     
     if (items.length === 0) {
-      alert('Giỏ hàng của bạn đang trống!');
+      toast.error('Giỏ hàng của bạn đang trống!', {
+        description: 'Vui lòng thêm sản phẩm trước khi thanh toán',
+      });
       router.push('/cart');
       return;
     }

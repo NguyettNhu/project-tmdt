@@ -18,10 +18,13 @@ export default function ShopContent() {
 
   // Set search query from URL params
   useEffect(() => {
-    const searchFromUrl = searchParams.get('search');
-    if (searchFromUrl) {
-      setSearchQuery(searchFromUrl);
-    }
+    const updateSearchFromUrl = () => {
+      const searchFromUrl = searchParams.get('search');
+      if (searchFromUrl) {
+        setSearchQuery(searchFromUrl);
+      }
+    };
+    updateSearchFromUrl();
   }, [searchParams]);
 
   // Define category structure with icons
