@@ -3,9 +3,8 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { CartProvider } from "@/components/CartContext";
-import Footer from "@/components/Footer";
-import Header from "@/components/Header";
 import { Toaster } from "sonner";
+import ConditionalLayout from "@/components/ConditionalLayout";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -32,16 +31,8 @@ export default function RootLayout({
       <body
         className={`${inter.variable} antialiased bg-white text-[#1A1A1A] flex flex-col min-h-screen`}
       >
-
         <CartProvider>
-          <Header />
-          {/* Main content area - grows to fill available space */}
-          <div className="grow w-full">
-            {children}
-          </div>
-          
-          {/* Footer - always at bottom */}
-          <Footer />
+          <ConditionalLayout>{children}</ConditionalLayout>
           <Toaster position="bottom-right" richColors closeButton />
         </CartProvider>
       </body>
