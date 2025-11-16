@@ -106,12 +106,16 @@ export function getCurrentUser(): User | null {
 export function saveCurrentUser(user: User): void {
   if (typeof window === 'undefined') return;
   localStorage.setItem('currentUser', JSON.stringify(user));
+  // Dispatch custom event to notify other components
+  window.dispatchEvent(new Event('auth-change'));
 }
 
 // Logout
 export function logoutUser(): void {
   if (typeof window === 'undefined') return;
   localStorage.removeItem('currentUser');
+  // Dispatch custom event to notify other components
+  window.dispatchEvent(new Event('auth-change'));
 }
 
 // Check if user is logged in

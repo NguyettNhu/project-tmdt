@@ -13,6 +13,7 @@ export default function Header() {
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
+  const [mounted, setMounted] = useState(false);
 
   const navItems = [
     { label: 'Trang chủ', href: '/' },
@@ -23,11 +24,59 @@ export default function Header() {
 
   const { count } = useCart();
 
+  // Handle hydration mismatch
+  useEffect(() => {
+    const handleMount = () => {
+      setMounted(true);
+    };
+    handleMount();
+  }, []);
+
   useEffect(() => {
     const loadUser = () => {
-      setUser(getCurrentUser());
+      const currentUser = getCurrentUser();
+      setUser(currentUser);
     };
+    
+    // Load user initially
     loadUser();
+
+    // Listen for storage changes (when user logs in/out from other tabs)
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'currentUser') {
+        loadUser();
+      }
+    };
+
+    // Listen for custom event (for same-tab updates)
+    const handleAuthChange = () => {
+      loadUser();
+    };
+
+    // Poll for changes every 500ms (fallback for router transitions)
+    const pollInterval = setInterval(() => {
+      const currentUser = getCurrentUser();
+      const currentUserId = currentUser?.id;
+      
+      // Use callback to avoid dependency on user state
+      setUser((prevUser) => {
+        const prevUserId = prevUser?.id;
+        if (currentUserId !== prevUserId) {
+          return currentUser;
+        }
+        return prevUser;
+      });
+    }, 500);
+
+    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('auth-change', handleAuthChange);
+
+    // Cleanup
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('auth-change', handleAuthChange);
+      clearInterval(pollInterval);
+    };
   }, []);
 
   const handleSearch = () => {
@@ -173,7 +222,7 @@ export default function Header() {
                   d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
                 />
               </svg>
-              {count > 0 && (
+              {mounted && count > 0 && (
                 <span className="absolute -top-0.5 -right-0.5 bg-linear-to-r from-[#D9006C] to-[#FF1A7A] text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center shadow-lg animate-pulse">{count}</span>
               )}
             </Link>
@@ -253,18 +302,33 @@ export default function Header() {
               
               {/* Mobile Auth Links */}
               <div className="border-t border-gray-100 pt-4 mt-4 px-4 space-y-3">
-                <Link
-                  href="/auth/login"
-                  className="block text-center py-3 text-gray-700 font-semibold border-2 border-gray-300 rounded-full hover:border-[#D9006C] hover:text-[#D9006C] transition-all duration-200"
-                >
-                  Đăng nhập
-                </Link>
-                <Link 
-                  href="/auth/register" 
-                  className="block text-center px-4 py-3 bg-linear-to-r from-[#D9006C] to-[#FF1A7A] text-white font-semibold rounded-full shadow-md hover:shadow-lg active:scale-95 transition-all duration-200"
-                >
-                  Đăng kí
-                </Link>
+                {user ? (
+                  <Link
+                    href="/profile"
+                    className="flex items-center gap-3 px-4 py-3 rounded-xl bg-linear-to-r from-purple-100 to-pink-100 hover:from-purple-200 hover:to-pink-200 transition-all duration-200"
+                  >
+                    <UserIcon className="w-5 h-5 text-purple-700" />
+                    <div className="flex-1">
+                      <p className="text-gray-900 font-semibold text-sm">{user.fullName}</p>
+                      <p className="text-gray-600 text-xs">{user.email}</p>
+                    </div>
+                  </Link>
+                ) : (
+                  <>
+                    <Link
+                      href="/auth/login"
+                      className="block text-center py-3 text-gray-700 font-semibold border-2 border-gray-300 rounded-full hover:border-[#D9006C] hover:text-[#D9006C] transition-all duration-200"
+                    >
+                      Đăng nhập
+                    </Link>
+                    <Link 
+                      href="/auth/register" 
+                      className="block text-center px-4 py-3 bg-linear-to-r from-[#D9006C] to-[#FF1A7A] text-white font-semibold rounded-full shadow-md hover:shadow-lg active:scale-95 transition-all duration-200"
+                    >
+                      Đăng kí
+                    </Link>
+                  </>
+                )}
               </div>
             </div>
           </nav>

@@ -136,7 +136,7 @@ export default function ContactPage() {
                       Địa chỉ
                     </h3>
                     <p className="text-gray-600">
-                      123 Đường Nguyễn Huệ, Quận 1, TP. Hồ Chí Minh
+                      Nam Từ Liêm, Hà Nội
                     </p>
                   </div>
                 </div>
@@ -149,8 +149,11 @@ export default function ContactPage() {
                     <h3 className="font-semibold text-gray-800 mb-1">
                       Điện thoại
                     </h3>
-                    <p className="text-gray-600">+84 123 456 789</p>
-                    <p className="text-gray-600">+84 987 654 321</p>
+                    <p className="text-gray-600">
+                      <a href="tel:0355329485" className="hover:text-[#D9006C] transition-colors">
+                        0355 329 485
+                      </a>
+                    </p>
                   </div>
                 </div>
 
@@ -400,7 +403,7 @@ export default function ContactPage() {
                 </h2>
                 <div className="w-full h-64 bg-gray-200 rounded-xl overflow-hidden">
                   <iframe
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3919.4968183019333!2d106.69525731533415!3d10.775039092319922!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31752f4b3330bcc9%3A0xb2b991526cbbe2de!2zMTIzIE5ndXnhu4VuIEh14buHLCBC4bq_biBOZ2jDqSwgUXXhuq1uIDEsIFRow6BuaCBwaOG7kSBI4buTIENow60gTWluaCwgVmnhu4d0IE5hbQ!5e0!3m2!1svi!2s!4v1699999999999!5m2!1svi!2s"
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d29799.88374780996!2d105.73253517910156!3d21.02777198000001!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x313454ab6db919a9%3A0x6c2555e8048876e!2zTmFtIFThu6sgTGnDqm0sIEjDoCBO4buZaSwgVmnhu4d0IE5hbQ!5e0!3m2!1svi!2s!4v1700000000000!5m2!1svi!2s"
                     width="100%"
                     height="100%"
                     style={{ border: 0 }}
