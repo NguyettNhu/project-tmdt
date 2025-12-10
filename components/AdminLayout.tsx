@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { 
   LayoutDashboard, 
@@ -14,7 +14,12 @@ import {
   Settings, 
   Bell, 
   ChevronLeft, 
-  ChevronRight 
+  ChevronRight,
+  FolderOpen,
+  LogOut,
+  User,
+  KeyRound,
+  Loader2
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -24,6 +29,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -44,6 +58,11 @@ const menuItems = [
     title: 'Quản lý Sản phẩm',
     href: '/admin/products',
     icon: Package,
+  },
+  {
+    title: 'Quản lý Danh mục',
+    href: '/admin/categories',
+    icon: FolderOpen,
   },
   {
     title: 'Quản lý Người dùng',
@@ -69,10 +88,86 @@ const menuItems = [
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
   const pathname = usePathname();
+  const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false);
+  const [adminUser, setAdminUser] = useState<{ name: string; email: string; role: string } | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Check authentication on mount
+  useEffect(() => {
+    const checkAuth = () => {
+      const userStr = localStorage.getItem('adminUser');
+      const token = localStorage.getItem('adminToken');
+      
+      if (!userStr || !token) {
+        router.push('/admin/login');
+        return;
+      }
+      
+      try {
+        const user = JSON.parse(userStr);
+        setAdminUser(user);
+      } catch {
+        router.push('/admin/login');
+        return;
+      }
+      
+      setIsLoading(false);
+    };
+    
+    checkAuth();
+  }, [router]);
+
+  const handleLogout = () => {
+    // Xóa thông tin đăng nhập
+    localStorage.removeItem('adminUser');
+    localStorage.removeItem('adminToken');
+    // Chuyển hướng về trang login admin
+    router.push('/admin/login');
+  };
+
+  // Show loading while checking auth
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <Loader2 className="w-10 h-10 animate-spin text-pink-500 mx-auto mb-4" />
+          <p className="text-gray-500">Đang tải...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-screen bg-gray-50">
+      {/* Logout Confirmation Dialog */}
+      <Dialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <LogOut className="w-5 h-5 text-red-500" />
+              Xác nhận đăng xuất
+            </DialogTitle>
+            <DialogDescription>
+              Bạn có chắc chắn muốn đăng xuất khỏi hệ thống quản trị?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => setShowLogoutDialog(false)}>
+              Hủy
+            </Button>
+            <Button 
+              variant="destructive" 
+              onClick={handleLogout}
+              className="bg-red-500 hover:bg-red-600"
+            >
+              <LogOut className="w-4 h-4 mr-2" />
+              Đăng xuất
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
       {/* Sidebar */}
       <aside
         className={`${
@@ -142,27 +237,60 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
             {/* User Dropdown */}
             <DropdownMenu>
-              <DropdownMenuTrigger className="flex items-center space-x-2 focus:outline-none">
-                <Avatar>
+              <DropdownMenuTrigger className="flex items-center space-x-2 focus:outline-none hover:bg-gray-50 rounded-lg p-2 transition-colors">
+                <Avatar className="border-2 border-pink-100">
                   <AvatarImage src="/images/admin-avatar.jpg" />
-                  <AvatarFallback>AD</AvatarFallback>
+                  <AvatarFallback className="bg-linear-to-br from-pink-400 to-purple-500 text-white">
+                    {adminUser?.name?.charAt(0) || 'A'}
+                  </AvatarFallback>
                 </Avatar>
                 <div className="text-left hidden md:block">
-                  <p className="text-sm font-medium">Admin User</p>
-                  <p className="text-xs text-gray-500">admin@example.com</p>
+                  <p className="text-sm font-medium">{adminUser?.name || 'Admin'}</p>
+                  <p className="text-xs text-gray-500">
+                    {adminUser?.role === 'super_admin' ? 'Super Admin' : 'Manager'}
+                  </p>
                 </div>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuLabel>Tài khoản của tôi</DropdownMenuLabel>
+                <DropdownMenuLabel>
+                  <div className="flex items-center gap-3 py-2">
+                    <Avatar className="w-10 h-10">
+                      <AvatarImage src="/images/admin-avatar.jpg" />
+                      <AvatarFallback className="bg-linear-to-br from-pink-400 to-purple-500 text-white">
+                        {adminUser?.name?.charAt(0) || 'A'}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <p className="font-medium">{adminUser?.name || 'Admin'}</p>
+                      <p className="text-xs text-gray-500 font-normal">{adminUser?.email || 'admin@styla.com'}</p>
+                    </div>
+                  </div>
+                </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>
-                  <Link href="/admin/profile">Hồ sơ</Link>
+                <DropdownMenuItem asChild>
+                  <Link href="/admin/profile" className="flex items-center gap-2 cursor-pointer">
+                    <User className="w-4 h-4" />
+                    Hồ sơ cá nhân
+                  </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Link href="/admin/settings">Cài đặt</Link>
+                <DropdownMenuItem asChild>
+                  <Link href="/admin/profile" className="flex items-center gap-2 cursor-pointer">
+                    <KeyRound className="w-4 h-4" />
+                    Đổi mật khẩu
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/admin/settings" className="flex items-center gap-2 cursor-pointer">
+                    <Settings className="w-4 h-4" />
+                    Cài đặt
+                  </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem className="text-red-600">
+                <DropdownMenuItem 
+                  className="text-red-600 cursor-pointer focus:text-red-600 focus:bg-red-50"
+                  onClick={() => setShowLogoutDialog(true)}
+                >
+                  <LogOut className="w-4 h-4 mr-2" />
                   Đăng xuất
                 </DropdownMenuItem>
               </DropdownMenuContent>
