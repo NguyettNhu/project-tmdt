@@ -1,4 +1,3 @@
-import Header from '@/components/Header';
 import { getProductById } from '@/lib/products';
 import { notFound } from 'next/navigation';
 import AddToCartButton from '@/components/AddToCartButton';

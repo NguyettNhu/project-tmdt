@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { toast } from 'sonner';
 import { Eye, EyeOff, Lock, Mail, Shield, ArrowRight, Loader2 } from 'lucide-react';
 
@@ -255,12 +256,12 @@ export default function AdminLoginPage() {
 
           {/* Back to Website */}
           <div className="mt-6 text-center">
-            <a 
+            <Link 
               href="/" 
               className="text-sm text-gray-500 hover:text-pink-600 transition-colors inline-flex items-center gap-1"
             >
               ← Quay về trang chính
-            </a>
+            </Link>
           </div>
         </div>
       </div>

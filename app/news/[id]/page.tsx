@@ -2,7 +2,7 @@
 
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { Calendar, User, Clock, ArrowLeft, Share2, Facebook, Twitter, BookmarkPlus, Tag, ChevronRight } from 'lucide-react';
+import { Calendar, Clock, ArrowLeft, Share2, Facebook, Twitter, BookmarkPlus, Tag, ChevronRight } from 'lucide-react';
 
 // Mock data chi tiết bài viết
 const newsArticles = [

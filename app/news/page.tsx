@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { Calendar, User, ArrowRight, Search, Tag } from 'lucide-react';
 
 // Mock data cho tin tức
