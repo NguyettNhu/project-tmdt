@@ -1,10 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Bỏ qua ESLint và TypeScript errors khi build (để deploy Vercel thành công)
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
+  // Bỏ qua TypeScript errors khi build (để deploy Vercel thành công)
   typescript: {
     ignoreBuildErrors: true,
   },

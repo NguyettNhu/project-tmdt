@@ -67,7 +67,7 @@ export default function AboutPage() {
 
           <motion.p
             variants={fadeUp}
-            className="text-xl sm:text-2xl text-gray-700 max-w-3xl mx-auto leading-relaxed font-light"
+            className="text-xl sm:text-2xl text-gray-800 max-w-3xl mx-auto leading-relaxed font-normal"
           >
             STYLA không chỉ là thời trang. Đó là sự tôn vinh cá tính, 
             là những thiết kế tối giản nhưng đầy cảm xúc, 
@@ -88,9 +88,9 @@ export default function AboutPage() {
             <motion.div variants={fadeUp} className="space-y-12">
               <div>
                 <h2 className="text-5xl font-black text-gray-900 mb-6">Sứ mệnh của chúng tôi</h2>
-                <p className="text-xl text-gray-600 leading-relaxed">
+                <p className="text-xl text-gray-800 leading-relaxed font-medium">
                   Mang đến những thiết kế tinh tế, bền vững và dễ dàng hòa quyện vào cuộc sống thường nhật. 
-                  Chúng tôi tin rằng trang phục đẹp nhất là trang phục khiến bạn cảm thấy <span className="text-[#D9006C] font-semibold">là chính mình</span>.
+                  Chúng tôi tin rằng trang phục đẹp nhất là trang phục khiến bạn cảm thấy <span className="text-[#D9006C] font-bold">là chính mình</span>.
                 </p>
               </div>
 
@@ -103,18 +103,18 @@ export default function AboutPage() {
                 ].map((value, i) => (
                   <motion.div key={i} variants={fadeUp} className="flex items-start gap-4 group">
                     <div className="w-3 h-3 rounded-full bg-[#FF1A7A] mt-2 shrink-0 group-hover:scale-150 transition-transform"></div>
-                    <p className="text-gray-700 text-lg">{value}</p>
+                    <p className="text-gray-900 text-lg font-medium">{value}</p>
                   </motion.div>
                 ))}
               </div>
 
               <motion.div variants={fadeUp} className="pt-8">
-                <div className="bg-gray-900 text-white p-8 rounded-3xl shadow-2xl">
-                  <h3 className="text-2xl font-black mb-6 flex items-center gap-3">
-                    <span className="text-3xl">Email</span> Liên hệ ngay
+                <div className="bg-gray-900 p-8 rounded-3xl shadow-2xl">
+                  <h3 className="text-2xl font-black mb-6 flex items-center gap-3 text-white!">
+                    <span className="text-3xl">📧</span> Liên hệ ngay
                   </h3>
-                  <p className="text-pink-200 mb-4">Chúng tôi luôn ở đây để lắng nghe bạn</p>
-                  <a href="mailto:hello@styla.vn" className="text-[#FF69B4] hover:text-white font-bold text-lg">
+                  <p className="text-white! mb-4 font-semibold">Chúng tôi luôn ở đây để lắng nghe bạn</p>
+                  <a href="mailto:hello@styla.vn" className="text-white! hover:text-pink-300! font-bold text-xl transition-colors">
                     hello@styla.vn
                   </a>
                 </div>
@@ -134,12 +134,12 @@ export default function AboutPage() {
                   >
                     Dress
                   </motion.div>
-                  <h3 className="text-4xl font-black mb-4">Tinh tế trong từng chi tiết</h3>
-                  <p className="text-xl opacity-90">Từ ý tưởng đến sản phẩm hoàn thiện</p>
+                  <h3 className="text-4xl font-black mb-4 ">Tinh tế trong từng chi tiết</h3>
+                  <p className="text-xl font-medium">Từ ý tưởng đến sản phẩm hoàn thiện</p>
                 </div>
                 
-                <div className="bg-white/10 backdrop-blur-md rounded-2xl p-8 border border-white/20">
-                  <p className="text-lg leading-relaxed">
+                <div className="bg-white/20 backdrop-blur-md rounded-2xl p-8 border border-white/30 ">
+                  <p className="text-lg leading-relaxed text-white font-medium">
                     Mỗi sản phẩm STYLA đều được chọn lọc từ chất liệu cao cấp, 
                     gia công tỉ mỉ tại các xưởng uy tín và kiểm định nghiêm ngặt 
                     trước khi đến tay bạn.
@@ -163,7 +163,7 @@ export default function AboutPage() {
             <h2 className="text-5xl sm:text-6xl font-black text-gray-900 mb-6">
               Đội ngũ đằng sau STYLA
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-xl text-gray-800 max-w-3xl mx-auto font-medium">
               Những con người tận tâm, sáng tạo và luôn đặt trải nghiệm khách hàng lên hàng đầu.
             </p>
           </motion.div>
@@ -192,7 +192,7 @@ export default function AboutPage() {
                     {member.emoji}
                   </div>
                   <h3 className="text-xl font-bold text-gray-900 mb-1">{member.name}</h3>
-                  <p className="text-sm text-gray-600">{member.role}</p>
+                  <p className="text-sm text-gray-700 font-medium">{member.role}</p>
                 </div>
                 <div className="h-2 bg-linear-to-r from-[#D9006C] to-[#FF1A7A] transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-500"></div>
               </motion.div>

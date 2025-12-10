@@ -43,7 +43,7 @@ export const mockOrders: Order[] = [
       {
         productId: 1,
         productName: 'Áo Thun Basic Trắng',
-        productImage: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500',
+        productImage: '/images/product-01.jpg',
         quantity: 2,
         price: 29.99,
         size: 'M',
@@ -52,7 +52,7 @@ export const mockOrders: Order[] = [
       {
         productId: 5,
         productName: 'Quần Jean Xanh',
-        productImage: 'https://images.unsplash.com/photo-1542272604-787c3835535d?w=500',
+        productImage: '/images/product-05.jpg',
         quantity: 1,
         price: 59.99,
         size: 'L'
@@ -81,7 +81,7 @@ export const mockOrders: Order[] = [
       {
         productId: 3,
         productName: 'Áo Hoodie Đen',
-        productImage: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=500',
+        productImage: '/images/product-03.jpg',
         quantity: 1,
         price: 49.99,
         size: 'L',
@@ -112,7 +112,7 @@ export const mockOrders: Order[] = [
       {
         productId: 8,
         productName: 'Giày Sneaker Trắng',
-        productImage: 'https://images.unsplash.com/photo-1549298916-b41d501d3772?w=500',
+        productImage: '/images/product-08.jpg',
         quantity: 1,
         price: 89.99,
         size: '42'
@@ -120,7 +120,7 @@ export const mockOrders: Order[] = [
       {
         productId: 10,
         productName: 'Túi Xách Da',
-        productImage: 'https://images.unsplash.com/photo-1590874103328-eac38a683ce7?w=500',
+        productImage: '/images/product-10.jpg',
         quantity: 1,
         price: 129.99,
         color: 'Nâu'
@@ -148,7 +148,7 @@ export const mockOrders: Order[] = [
       {
         productId: 2,
         productName: 'Áo Thun Đen Basic',
-        productImage: 'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=500',
+        productImage: '/images/product-02.jpg',
         quantity: 3,
         price: 29.99,
         size: 'S',
@@ -178,7 +178,7 @@ export const mockOrders: Order[] = [
       {
         productId: 11,
         productName: 'Gấu Bông Teddy',
-        productImage: 'https://images.unsplash.com/photo-1551107696-a4b0c5a0d9a2?w=500',
+        productImage: '/images/product-11.jpg',
         quantity: 2,
         price: 39.99
       }
