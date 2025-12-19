@@ -4,16 +4,16 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCart } from './CartContext';
-import { getCurrentUser, type User } from '@/lib/auth';
-import { User as UserIcon } from 'lucide-react';
+import { useAuth } from '@/lib/AuthContext';
+import { User as UserIcon, LogOut } from 'lucide-react';
 
 export default function Header() {
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
   const [mounted, setMounted] = useState(false);
+  const { customer, isAuthenticated, logout, loading } = useAuth();
 
   const navItems = [
     { label: 'Trang chủ', href: '/' },
@@ -33,52 +33,10 @@ export default function Header() {
     handleMount();
   }, []);
 
-  useEffect(() => {
-    const loadUser = () => {
-      const currentUser = getCurrentUser();
-      setUser(currentUser);
-    };
-    
-    // Load user initially
-    loadUser();
-
-    // Listen for storage changes (when user logs in/out from other tabs)
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'currentUser') {
-        loadUser();
-      }
-    };
-
-    // Listen for custom event (for same-tab updates)
-    const handleAuthChange = () => {
-      loadUser();
-    };
-
-    // Poll for changes every 500ms (fallback for router transitions)
-    const pollInterval = setInterval(() => {
-      const currentUser = getCurrentUser();
-      const currentUserId = currentUser?.id;
-      
-      // Use callback to avoid dependency on user state
-      setUser((prevUser) => {
-        const prevUserId = prevUser?.id;
-        if (currentUserId !== prevUserId) {
-          return currentUser;
-        }
-        return prevUser;
-      });
-    }, 500);
-
-    window.addEventListener('storage', handleStorageChange);
-    window.addEventListener('auth-change', handleAuthChange);
-
-    // Cleanup
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-      window.removeEventListener('auth-change', handleAuthChange);
-      clearInterval(pollInterval);
-    };
-  }, []);
+  const handleLogout = async () => {
+    await logout();
+    router.push('/');
+  };
 
   const handleSearch = () => {
     if (searchQuery.trim()) {
@@ -126,14 +84,23 @@ export default function Header() {
           <div className="flex items-center gap-2 md:gap-4">
             {/* Login & Register / User Profile - Desktop */}
             <div className="hidden lg:flex items-center gap-4">
-              {user ? (
-                <Link
-                  href="/profile"
-                  className="flex items-center gap-2 px-4 py-2 rounded-full bg-linear-to-r from-purple-100 to-pink-100 hover:from-purple-200 hover:to-pink-200 transition-all duration-200"
-                >
-                  <UserIcon className="w-5 h-5 text-purple-700" />
-                  <span className="text-gray-900 font-semibold text-sm">{user.fullName}</span>
-                </Link>
+              {isAuthenticated && customer ? (
+                <div className="flex items-center gap-3">
+                  <Link
+                    href="/profile"
+                    className="flex items-center gap-2 px-4 py-2 rounded-full bg-linear-to-r from-purple-100 to-pink-100 hover:from-purple-200 hover:to-pink-200 transition-all duration-200"
+                  >
+                    <UserIcon className="w-5 h-5 text-purple-700" />
+                    <span className="text-gray-900 font-semibold text-sm">{customer.name}</span>
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center gap-1 px-3 py-2 text-gray-600 hover:text-red-600 transition-colors duration-200"
+                    title="Đăng xuất"
+                  >
+                    <LogOut className="w-4 h-4" />
+                  </button>
+                </div>
               ) : (
                 <>
                   <Link
@@ -303,17 +270,26 @@ export default function Header() {
               
               {/* Mobile Auth Links */}
               <div className="border-t border-gray-100 pt-4 mt-4 px-4 space-y-3">
-                {user ? (
-                  <Link
-                    href="/profile"
-                    className="flex items-center gap-3 px-4 py-3 rounded-xl bg-linear-to-r from-purple-100 to-pink-100 hover:from-purple-200 hover:to-pink-200 transition-all duration-200"
-                  >
-                    <UserIcon className="w-5 h-5 text-purple-700" />
-                    <div className="flex-1">
-                      <p className="text-gray-900 font-semibold text-sm">{user.fullName}</p>
-                      <p className="text-gray-600 text-xs">{user.email}</p>
-                    </div>
-                  </Link>
+                {isAuthenticated && customer ? (
+                  <>
+                    <Link
+                      href="/profile"
+                      className="flex items-center gap-3 px-4 py-3 rounded-xl bg-linear-to-r from-purple-100 to-pink-100 hover:from-purple-200 hover:to-pink-200 transition-all duration-200"
+                    >
+                      <UserIcon className="w-5 h-5 text-purple-700" />
+                      <div className="flex-1">
+                        <p className="text-gray-900 font-semibold text-sm">{customer.name}</p>
+                        <p className="text-gray-600 text-xs">{customer.email}</p>
+                      </div>
+                    </Link>
+                    <button
+                      onClick={handleLogout}
+                      className="flex items-center justify-center gap-2 w-full py-3 text-red-600 font-semibold border-2 border-red-200 rounded-full hover:bg-red-50 transition-all duration-200"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      Đăng xuất
+                    </button>
+                  </>
                 ) : (
                   <>
                     <Link

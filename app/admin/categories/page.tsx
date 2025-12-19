@@ -22,60 +22,62 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { FolderOpen, Edit, Trash2, Plus, Search, ToggleLeft, ToggleRight, Eye } from 'lucide-react';
-
-interface Category {
-  id: string;
-  name: string;
-  slug: string;
-  description: string;
-  productCount: number;
-  status: 'active' | 'inactive';
-  parent?: string;
-  image?: string;
-  icon: string;
-}
-
-const mockCategories: Category[] = [
-  { id: 'CAT001', name: 'Áo', slug: 'ao', description: 'Các loại áo thời trang', productCount: 45, status: 'active', icon: '👕' },
-  { id: 'CAT002', name: 'Quần', slug: 'quan', description: 'Các loại quần thời trang', productCount: 38, status: 'active', icon: '👖' },
-  { id: 'CAT003', name: 'Giày', slug: 'giay', description: 'Giày dép các loại', productCount: 28, status: 'active', icon: '👟' },
-  { id: 'CAT004', name: 'Phụ kiện', slug: 'phu-kien', description: 'Túi xách, mũ nón, thắt lưng...', productCount: 52, status: 'active', icon: '👜' },
-  { id: 'CAT005', name: 'Nam', slug: 'nam', description: 'Thời trang nam', productCount: 78, status: 'active', icon: '👔' },
-  { id: 'CAT006', name: 'Nữ', slug: 'nu', description: 'Thời trang nữ', productCount: 85, status: 'active', icon: '👗' },
-  { id: 'CAT007', name: 'Trẻ em', slug: 'tre-em', description: 'Thời trang trẻ em', productCount: 32, status: 'active', icon: '🧒' },
-  { id: 'CAT008', name: 'Sale', slug: 'sale', description: 'Sản phẩm giảm giá', productCount: 24, status: 'active', icon: '🏷️' },
-];
+import { FolderOpen, Edit, Trash2, Plus, Search, ToggleLeft, ToggleRight, Eye, Loader2 } from 'lucide-react';
+import { useCategories } from '@/lib/hooks';
+import { ApiCategory, getImageUrl } from '@/lib/api';
 
 export default function CategoriesPage() {
-  const [categories, setCategories] = useState<Category[]>(mockCategories);
+  const { categories: apiCategories, loading, error, refetch } = useCategories();
   const [searchTerm, setSearchTerm] = useState('');
   const [isCategoryDialogOpen, setIsCategoryDialogOpen] = useState(false);
-  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+  const [editingCategory, setEditingCategory] = useState<ApiCategory | null>(null);
 
-  const handleDeleteCategory = (id: string) => {
+  const handleDeleteCategory = (id: number) => {
     if (confirm('Bạn có chắc muốn xóa danh mục này? Các sản phẩm trong danh mục sẽ được chuyển sang danh mục khác.')) {
-      setCategories(categories.filter(c => c.id !== id));
+      // TODO: Implement delete API call
+      console.log('Delete category:', id);
     }
   };
 
-  const handleToggleCategoryStatus = (id: string) => {
-    setCategories(categories.map(c =>
-      c.id === id ? { ...c, status: c.status === 'active' ? 'inactive' : 'active' } : c
-    ));
+  const handleToggleCategoryStatus = (id: number) => {
+    // TODO: Implement toggle status API call
+    console.log('Toggle category status:', id);
   };
 
-  const handleOpenCategoryDialog = (category?: Category) => {
+  const handleOpenCategoryDialog = (category?: ApiCategory) => {
     setEditingCategory(category || null);
     setIsCategoryDialogOpen(true);
   };
 
-  const filteredCategories = categories.filter(category =>
+  const filteredCategories = apiCategories.filter(category =>
     category.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     category.slug.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const totalProducts = categories.reduce((sum, cat) => sum + cat.productCount, 0);
+  const activeCount = apiCategories.filter(c => c.status === 1).length;
+  const inactiveCount = apiCategories.filter(c => c.status !== 1).length;
+
+  if (loading) {
+    return (
+      <AdminLayout>
+        <div className="flex items-center justify-center h-64">
+          <Loader2 className="w-8 h-8 animate-spin text-pink-500" />
+          <span className="ml-2">Đang tải dữ liệu...</span>
+        </div>
+      </AdminLayout>
+    );
+  }
+
+  if (error) {
+    return (
+      <AdminLayout>
+        <div className="flex flex-col items-center justify-center h-64">
+          <p className="text-red-500 mb-4">Lỗi: {error}</p>
+          <Button onClick={refetch}>Thử lại</Button>
+        </div>
+      </AdminLayout>
+    );
+  }
 
   return (
     <AdminLayout>
@@ -85,13 +87,13 @@ export default function CategoriesPage() {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Card>
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-500">Tổng danh mục</p>
-                  <p className="text-2xl font-bold">{categories.length}</p>
+                  <p className="text-2xl font-bold">{apiCategories.length}</p>
                 </div>
                 <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
                   <FolderOpen className="w-6 h-6 text-blue-600" />
@@ -104,9 +106,7 @@ export default function CategoriesPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-500">Đang hoạt động</p>
-                  <p className="text-2xl font-bold text-green-600">
-                    {categories.filter(c => c.status === 'active').length}
-                  </p>
+                  <p className="text-2xl font-bold text-green-600">{activeCount}</p>
                 </div>
                 <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
                   <FolderOpen className="w-6 h-6 text-green-600" />
@@ -119,25 +119,10 @@ export default function CategoriesPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-500">Đã ẩn</p>
-                  <p className="text-2xl font-bold text-gray-600">
-                    {categories.filter(c => c.status === 'inactive').length}
-                  </p>
+                  <p className="text-2xl font-bold text-gray-600">{inactiveCount}</p>
                 </div>
                 <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
                   <FolderOpen className="w-6 h-6 text-gray-600" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-500">Tổng sản phẩm</p>
-                  <p className="text-2xl font-bold text-pink-600">{totalProducts}</p>
-                </div>
-                <div className="w-12 h-12 bg-pink-100 rounded-full flex items-center justify-center">
-                  <FolderOpen className="w-6 h-6 text-pink-600" />
                 </div>
               </div>
             </CardContent>
@@ -171,11 +156,10 @@ export default function CategoriesPage() {
               <Table>
                 <TableHeader>
                   <TableRow className="bg-gray-50">
-                    <TableHead className="font-semibold">Avatar</TableHead>
+                    <TableHead className="font-semibold">Hình ảnh</TableHead>
                     <TableHead className="font-semibold">Tên danh mục</TableHead>
                     <TableHead className="font-semibold">Slug</TableHead>
-                    <TableHead className="font-semibold">Mô tả</TableHead>
-                    <TableHead className="font-semibold">Số sản phẩm</TableHead>
+                    <TableHead className="font-semibold">Loại</TableHead>
                     <TableHead className="font-semibold text-center">Kích hoạt</TableHead>
                     <TableHead className="font-semibold text-center">Hành động</TableHead>
                   </TableRow>
@@ -183,10 +167,18 @@ export default function CategoriesPage() {
                 <TableBody>
                   {filteredCategories.map((category) => (
                     <TableRow key={category.id} className="hover:bg-gray-50">
-                      {/* Avatar */}
+                      {/* Hình ảnh */}
                       <TableCell>
-                        <div className="w-14 h-14 bg-gradient-to-br from-pink-100 to-purple-100 rounded-lg flex items-center justify-center border">
-                          <span className="text-2xl">{category.icon}</span>
+                        <div className="w-14 h-14 bg-gradient-to-br from-pink-100 to-purple-100 rounded-lg flex items-center justify-center border overflow-hidden">
+                          {category.image ? (
+                            <img 
+                              src={getImageUrl(category.image, 'category')} 
+                              alt={category.name}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <FolderOpen className="w-6 h-6 text-gray-400" />
+                          )}
                         </div>
                       </TableCell>
 
@@ -194,7 +186,7 @@ export default function CategoriesPage() {
                       <TableCell>
                         <div>
                           <p className="font-medium text-gray-900">{category.name}</p>
-                          <p className="text-xs text-gray-500">{category.id}</p>
+                          <p className="text-xs text-gray-500">ID: {category.id}</p>
                         </div>
                       </TableCell>
 
@@ -205,17 +197,10 @@ export default function CategoriesPage() {
                         </code>
                       </TableCell>
 
-                      {/* Mô tả */}
-                      <TableCell>
-                        <p className="text-sm text-gray-600 max-w-[200px] truncate">
-                          {category.description}
-                        </p>
-                      </TableCell>
-
-                      {/* Số sản phẩm */}
+                      {/* Loại */}
                       <TableCell>
                         <span className="px-2 py-1 bg-blue-50 text-blue-600 rounded-full text-sm font-medium">
-                          {category.productCount} sản phẩm
+                          {category.type || 'Chung'}
                         </span>
                       </TableCell>
 
@@ -225,7 +210,7 @@ export default function CategoriesPage() {
                           onClick={() => handleToggleCategoryStatus(category.id)}
                           className="inline-flex items-center justify-center"
                         >
-                          {category.status === 'active' ? (
+                          {category.status === 1 ? (
                             <ToggleRight className="w-8 h-8 text-green-500" />
                           ) : (
                             <ToggleLeft className="w-8 h-8 text-gray-400" />
@@ -294,7 +279,7 @@ export default function CategoriesPage() {
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="cat-image" className="text-right">
-                Avatar
+                Hình ảnh
               </Label>
               <div className="col-span-3">
                 <Input
@@ -329,13 +314,13 @@ export default function CategoriesPage() {
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="description" className="text-right">
-                Mô tả
+              <Label htmlFor="type" className="text-right">
+                Loại
               </Label>
               <Input
-                id="description"
-                defaultValue={editingCategory?.description}
-                placeholder="Mô tả ngắn về danh mục"
+                id="type"
+                defaultValue={editingCategory?.type || ''}
+                placeholder="VD: product, post"
                 className="col-span-3"
               />
             </div>
@@ -345,11 +330,11 @@ export default function CategoriesPage() {
               </Label>
               <select
                 id="parent"
-                defaultValue={editingCategory?.parent || ''}
+                defaultValue={editingCategory?.parent_id || ''}
                 className="col-span-3 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
               >
                 <option value="">-- Không có --</option>
-                {categories.filter(c => c.id !== editingCategory?.id).map(cat => (
+                {apiCategories.filter(c => c.id !== editingCategory?.id).map(cat => (
                   <option key={cat.id} value={cat.id}>{cat.name}</option>
                 ))}
               </select>

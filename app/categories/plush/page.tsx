@@ -1,18 +1,17 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import Header from '@/components/Header';
 import { useProductsByCategoryType } from '@/lib/hooks';
 import { mapApiProductToProduct, getImageUrl } from '@/lib/api';
-import { FaMars, FaFilter, FaSortAmountDown, FaShoppingBag } from 'react-icons/fa';
+import { FaFilter, FaSortAmountDown, FaShoppingBag } from 'react-icons/fa';
 import Image from 'next/image';
-import { Shirt, Wind, Watch, Target } from 'lucide-react';
+import { Heart, Star, Gift, Sparkles } from 'lucide-react';
 
 type SortOption = 'featured' | 'price-low' | 'price-high' | 'name' | 'newest';
 
-export default function MenCategoryPage() {
-  // Sử dụng hook mới để lấy sản phẩm theo category type "men"
-  const { products: apiProducts, loading, error } = useProductsByCategoryType('men');
+export default function PlushCategoryPage() {
+  // Sử dụng hook để lấy sản phẩm theo category type "plush"
+  const { products: apiProducts, loading, error } = useProductsByCategoryType('plush');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [sortBy, setSortBy] = useState<SortOption>('featured');
   const [priceRange, setPriceRange] = useState<string>('all');
@@ -28,21 +27,21 @@ export default function MenCategoryPage() {
 
   const categories = [
     'all',
-    'T-Shirts',
-    'Hoodies',
-    'Jackets',
-    'Blazers',
-    'Pants',
-    'Shorts',
-    'Accessories'
+    'Gấu bông',
+    'Thú nhồi bông',
+    'Gối ôm',
+    'Móc khóa',
+    'Nhân vật hoạt hình',
+    'Động vật',
+    'Khác'
   ];
 
   const priceRanges = useMemo(() => [
     { id: 'all', label: 'Tất cả', min: 0, max: Infinity },
-    { id: '0-50', label: 'Dưới $50', min: 0, max: 50 },
+    { id: '0-20', label: 'Dưới $20', min: 0, max: 20 },
+    { id: '20-50', label: '$20 - $50', min: 20, max: 50 },
     { id: '50-100', label: '$50 - $100', min: 50, max: 100 },
-    { id: '100-200', label: '$100 - $200', min: 100, max: 200 },
-    { id: '200+', label: 'Trên $200', min: 200, max: Infinity }
+    { id: '100+', label: 'Trên $100', min: 100, max: Infinity }
   ], []);
 
   const filteredAndSortedProducts = useMemo(() => {
@@ -96,9 +95,9 @@ export default function MenCategoryPage() {
   // Loading state
   if (loading) {
     return (
-      <div className="min-h-screen bg-linear-to-br from-blue-50 to-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-linear-to-br from-pink-50 to-rose-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#1E3A8A] mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500 mx-auto mb-4"></div>
           <p className="text-gray-600">Đang tải sản phẩm...</p>
         </div>
       </div>
@@ -108,7 +107,7 @@ export default function MenCategoryPage() {
   // Error state
   if (error) {
     return (
-      <div className="min-h-screen bg-linear-to-br from-blue-50 to-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-linear-to-br from-pink-50 to-rose-50 flex items-center justify-center">
         <div className="text-center">
           <p className="text-red-500 mb-4">Lỗi: {error}</p>
           <p className="text-gray-600">Vui lòng kiểm tra kết nối API</p>
@@ -118,18 +117,18 @@ export default function MenCategoryPage() {
   }
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-blue-50 to-gray-50">
+    <div className="min-h-screen bg-linear-to-br from-pink-50 to-rose-50">
 
       {/* Hero Banner */}
-      <div className="bg-linear-to-r from-[#1E3A8A] to-[#3B82F6] text-white">
+      <div className="bg-linear-to-r from-pink-500 to-rose-400 text-white">
         <div className="container mx-auto px-4 py-12 md:py-16">
           <div className="max-w-4xl mx-auto text-center">
             <div className="flex items-center justify-center mb-4">
-              <FaMars className="text-5xl md:text-6xl mr-4" />
-              <h1 className="text-5xl md:text-7xl font-black">THỜI TRANG NAM</h1>
+              <Heart className="w-12 h-12 md:w-16 md:h-16 mr-4" />
+              <h1 className="text-5xl md:text-7xl font-black">GẤU BÔNG</h1>
             </div>
             <p className="text-xl md:text-2xl font-semibold mb-6">
-              Phong Cách Mạnh Mẽ & Lịch Lãm Dành Cho Phái Mạnh
+              Người bạn đồng hành dễ thương nhất
             </p>
             <div className="flex items-center justify-center gap-4 text-lg">
               <div className="flex items-center bg-white/20 backdrop-blur-sm px-6 py-3 rounded-full">
@@ -145,24 +144,24 @@ export default function MenCategoryPage() {
         {/* Category Banner Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 -mt-8">
           <div className="bg-white rounded-2xl shadow-xl p-6 text-center transform hover:scale-105 transition-transform">
-            <div className="text-gray-600 mb-2 flex justify-center"><Shirt className="w-8 h-8" /></div>
-            <div className="text-sm font-semibold text-gray-700">Áo sơ mi</div>
-            <div className="text-xs text-gray-500 mt-1">Lịch sự</div>
+            <div className="text-pink-500 mb-2 flex justify-center"><Heart className="w-8 h-8" /></div>
+            <div className="text-sm font-semibold text-gray-700">Gấu bông</div>
+            <div className="text-xs text-gray-500 mt-1">Dễ thương</div>
           </div>
           <div className="bg-white rounded-2xl shadow-xl p-6 text-center transform hover:scale-105 transition-transform">
-            <div className="text-gray-600 mb-2 flex justify-center"><Wind className="w-8 h-8" /></div>
-            <div className="text-sm font-semibold text-gray-700">Áo khoác</div>
-            <div className="text-xs text-gray-500 mt-1">Nam tính</div>
+            <div className="text-pink-500 mb-2 flex justify-center"><Star className="w-8 h-8" /></div>
+            <div className="text-sm font-semibold text-gray-700">Thú nhồi bông</div>
+            <div className="text-xs text-gray-500 mt-1">Đáng yêu</div>
           </div>
           <div className="bg-white rounded-2xl shadow-xl p-6 text-center transform hover:scale-105 transition-transform">
-            <div className="text-gray-600 mb-2 flex justify-center"><Shirt className="w-8 h-8" /></div>
-            <div className="text-sm font-semibold text-gray-700">Quần & Jeans</div>
-            <div className="text-xs text-gray-500 mt-1">Khỏe khoắn</div>
+            <div className="text-pink-500 mb-2 flex justify-center"><Gift className="w-8 h-8" /></div>
+            <div className="text-sm font-semibold text-gray-700">Gối ôm</div>
+            <div className="text-xs text-gray-500 mt-1">Êm ái</div>
           </div>
           <div className="bg-white rounded-2xl shadow-xl p-6 text-center transform hover:scale-105 transition-transform">
-            <div className="text-gray-600 mb-2 flex justify-center"><Watch className="w-8 h-8" /></div>
-            <div className="text-sm font-semibold text-gray-700">Phụ kiện</div>
-            <div className="text-xs text-gray-500 mt-1">Hoàn thiện</div>
+            <div className="text-pink-500 mb-2 flex justify-center"><Sparkles className="w-8 h-8" /></div>
+            <div className="text-sm font-semibold text-gray-700">Móc khóa</div>
+            <div className="text-xs text-gray-500 mt-1">Mini cute</div>
           </div>
         </div>
 
@@ -171,7 +170,7 @@ export default function MenCategoryPage() {
           <div className="lg:col-span-1">
             <div className="bg-white rounded-2xl shadow-lg p-6 sticky top-24">
               <div className="flex items-center mb-6">
-                <FaFilter className="text-2xl text-blue-600 mr-3" />
+                <FaFilter className="text-2xl text-pink-500 mr-3" />
                 <h2 className="text-2xl font-bold text-gray-800">Bộ Lọc</h2>
               </div>
 
@@ -185,7 +184,7 @@ export default function MenCategoryPage() {
                   placeholder="Tên sản phẩm..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-500"
                 />
               </div>
 
@@ -201,7 +200,7 @@ export default function MenCategoryPage() {
                       onClick={() => setSelectedCategory(category)}
                       className={`w-full text-left px-4 py-3 rounded-xl transition-all duration-300 ${
                         selectedCategory === category
-                          ? 'bg-linear-to-r from-[#1E3A8A] to-[#3B82F6] text-white shadow-lg'
+                          ? 'bg-linear-to-r from-pink-500 to-rose-400 text-white shadow-lg'
                           : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
                       }`}
                     >
@@ -225,7 +224,7 @@ export default function MenCategoryPage() {
                       onClick={() => setPriceRange(range.id)}
                       className={`w-full text-left px-4 py-3 rounded-xl transition-all duration-300 ${
                         priceRange === range.id
-                          ? 'bg-linear-to-r from-[#1E3A8A] to-[#3B82F6] text-white shadow-lg'
+                          ? 'bg-linear-to-r from-pink-500 to-rose-400 text-white shadow-lg'
                           : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
                       }`}
                     >
@@ -244,7 +243,7 @@ export default function MenCategoryPage() {
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value as SortOption)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-700 font-medium"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-500 bg-white text-gray-700 font-medium"
                 >
                   <option value="featured">Nổi bật</option>
                   <option value="newest">Mới nhất</option>
@@ -275,11 +274,11 @@ export default function MenCategoryPage() {
             {/* Results Info */}
             <div className="bg-white rounded-2xl shadow-lg p-4 mb-6 flex flex-col sm:flex-row items-center justify-between">
               <div className="text-gray-700 font-medium mb-2 sm:mb-0">
-                Hiển thị <span className="font-bold text-blue-600">{filteredAndSortedProducts.length}</span> sản phẩm
+                Hiển thị <span className="font-bold text-pink-500">{filteredAndSortedProducts.length}</span> sản phẩm
               </div>
               <div className="flex items-center space-x-2">
                 <span className="text-sm font-semibold text-gray-600">
-                  Thời trang nam cao cấp
+                  Gấu bông & Thú nhồi bông
                 </span>
               </div>
             </div>
@@ -299,7 +298,7 @@ export default function MenCategoryPage() {
                     setPriceRange('all');
                     setSearchQuery('');
                   }}
-                  className="px-6 py-3 bg-linear-to-r from-[#1E3A8A] to-[#3B82F6] text-white font-semibold rounded-xl hover:shadow-lg transition-all"
+                  className="px-6 py-3 bg-linear-to-r from-pink-500 to-rose-400 text-white font-semibold rounded-xl hover:shadow-lg transition-all"
                 >
                   Xem tất cả sản phẩm
                 </button>
@@ -311,7 +310,7 @@ export default function MenCategoryPage() {
                     {/* Featured Badge */}
                     {product.featured && (
                       <div className="absolute top-4 right-4 z-10">
-                        <div className="bg-blue-500 text-white font-bold text-xs px-3 py-1 rounded-full shadow-lg">
+                        <div className="bg-pink-500 text-white font-bold text-xs px-3 py-1 rounded-full shadow-lg">
                           HOT
                         </div>
                       </div>
@@ -327,43 +326,19 @@ export default function MenCategoryPage() {
                       />
                     </div>
                     <div className="p-6">
-                      <h3 className="text-lg font-bold text-gray-800 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
+                      <h3 className="text-lg font-bold text-gray-800 mb-2 line-clamp-2 group-hover:text-pink-500 transition-colors">
                         {product.name}
                       </h3>
                       <p className="text-sm text-gray-500 mb-4 capitalize">{product.category}</p>
                       
                       {/* Price */}
-                      <div className="text-2xl font-black text-blue-600 mb-4">
+                      <div className="text-2xl font-black text-pink-500 mb-4">
                         ${product.price.toLocaleString('en-US')}
                       </div>
 
-                      {/* Colors */}
-                      {product.colors && product.colors.length > 0 && (
-                        <div className="flex items-center gap-2 mb-4">
-                          <span className="text-xs text-gray-500">Màu:</span>
-                          <div className="flex gap-1">
-                            {product.colors.slice(0, 3).map((color, idx) => (
-                              <div
-                                key={idx}
-                                className="w-5 h-5 rounded-full border-2 border-gray-200"
-                                style={{
-                                  backgroundColor: color.toLowerCase() === 'white' ? '#ffffff' :
-                                                 color.toLowerCase() === 'black' ? '#000000' :
-                                                 color.toLowerCase() === 'gray' ? '#9CA3AF' :
-                                                 color.toLowerCase() === 'navy' ? '#1E3A8A' :
-                                                 color.toLowerCase() === 'red' ? '#DC2626' :
-                                                 color.toLowerCase() === 'blue' ? '#3B82F6' : '#D1D5DB'
-                                }}
-                                title={color}
-                              />
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
                       <button
                         onClick={() => window.location.href = `/product/${product.id}`}
-                        className="w-full bg-linear-to-r from-[#1E3A8A] to-[#3B82F6] text-white font-semibold py-3 rounded-xl hover:shadow-xl transition-all duration-300 hover:scale-105"
+                        className="w-full bg-linear-to-r from-pink-500 to-rose-400 text-white font-semibold py-3 rounded-xl hover:shadow-xl transition-all duration-300 hover:scale-105"
                       >
                         Xem chi tiết
                       </button>
@@ -376,16 +351,16 @@ export default function MenCategoryPage() {
         </div>
 
         {/* Bottom CTA */}
-        <div className="mt-12 bg-linear-to-r from-[#1E3A8A] to-[#3B82F6] rounded-2xl shadow-xl p-8 md:p-12 text-center text-white">
-          <div className="mb-4 flex justify-center"><Target className="w-16 h-16" /></div>
-          <h2 className="text-4xl font-black mb-4">BỘ SƯU TẬP NAM CAO CẤP</h2>
+        <div className="mt-12 bg-linear-to-r from-pink-500 to-rose-400 rounded-2xl shadow-xl p-8 md:p-12 text-center text-white">
+          <div className="mb-4 flex justify-center"><Heart className="w-16 h-16" /></div>
+          <h2 className="text-4xl font-black mb-4">GẤU BÔNG DỄ THƯƠNG</h2>
           <p className="text-xl mb-6 max-w-2xl mx-auto opacity-90">
-            Khám phá phong cách thời trang nam hiện đại. Mạnh mẽ, lịch lãm và đầy cá tính.
+            Người bạn đồng hành hoàn hảo. Mềm mại, dễ thương và đầy yêu thương.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button
               onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-              className="px-8 py-3 bg-white text-blue-600 font-semibold rounded-full hover:shadow-xl transition-all duration-300 hover:scale-105"
+              className="px-8 py-3 bg-white text-pink-500 font-semibold rounded-full hover:shadow-xl transition-all duration-300 hover:scale-105"
             >
               Khám phá ngay
             </button>

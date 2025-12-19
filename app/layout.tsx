@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { CartProvider } from "@/components/CartContext";
+import { AuthProvider } from "@/lib/AuthContext";
 import { Toaster } from "sonner";
 import ConditionalLayout from "@/components/ConditionalLayout";
 
@@ -31,10 +32,12 @@ export default function RootLayout({
       <body
         className={`${inter.variable} antialiased bg-white text-[#1A1A1A] flex flex-col min-h-screen`}
       >
-        <CartProvider>
-          <ConditionalLayout>{children}</ConditionalLayout>
-          <Toaster position="bottom-right" richColors closeButton />
-        </CartProvider>
+        <AuthProvider>
+          <CartProvider>
+            <ConditionalLayout>{children}</ConditionalLayout>
+            <Toaster position="bottom-right" richColors closeButton />
+          </CartProvider>
+        </AuthProvider>
       </body>
     </html>
   );

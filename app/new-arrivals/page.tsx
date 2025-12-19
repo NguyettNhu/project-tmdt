@@ -2,7 +2,8 @@
 
 import { useState, useMemo } from 'react';
 import Header from '@/components/Header';
-import { products } from '@/lib/products';
+import { useProducts } from '@/lib/hooks';
+import { mapApiProductToProduct, getImageUrl } from '@/lib/api';
 import { FaStar, FaFilter, FaSortAmountDown, FaShoppingBag, FaClock, FaBolt } from 'react-icons/fa';
 import Image from 'next/image';
 import { Check, X } from 'lucide-react';
@@ -10,10 +11,20 @@ import { Check, X } from 'lucide-react';
 type SortOption = 'newest' | 'price-low' | 'price-high' | 'name' | 'popular';
 
 export default function NewArrivalsPage() {
+  const { products: apiProducts, loading, error } = useProducts();
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [sortBy, setSortBy] = useState<SortOption>('newest');
   const [priceRange, setPriceRange] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Convert API products to frontend format
+  const products = useMemo(() => {
+    return apiProducts.map(p => ({
+      ...mapApiProductToProduct(p),
+      image: getImageUrl(p.avatar),
+      createdAt: p.created_at,
+    }));
+  }, [apiProducts]);
 
   const categories = [
     'all',
@@ -34,14 +45,24 @@ export default function NewArrivalsPage() {
     { id: '200+', label: 'Trên $200', min: 200, max: Infinity }
   ], []);
 
-  // Simulate "new arrivals" - products with ID > 20 are "new"
+  // Get new arrivals - products created in the last 30 days, sorted by newest
   const newArrivals = useMemo(() => {
-    return products.map(product => ({
-      ...product,
-      isNew: product.id >= 20, // Last 13 products are "new"
-      daysAgo: product.id >= 20 ? Math.floor((32 - product.id) / 2) + 1 : null // 1-7 days ago
-    })).filter(p => p.isNew);
-  }, []);
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    
+    return products.map(product => {
+      const createdDate = new Date(product.createdAt || Date.now());
+      const isNew = createdDate >= thirtyDaysAgo;
+      const timeDiff = Date.now() - createdDate.getTime();
+      const daysAgo = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+      
+      return {
+        ...product,
+        isNew: isNew || product.id >= products.length - 12, // Fallback: last 12 products are "new"
+        daysAgo: daysAgo < 30 ? daysAgo : null
+      };
+    }).filter(p => p.isNew).sort((a, b) => b.id - a.id);
+  }, [products]);
 
   const filteredAndSortedProducts = useMemo(() => {
     let filtered = [...newArrivals];
@@ -97,6 +118,30 @@ export default function NewArrivalsPage() {
     if (daysAgo === 2) return 'HÔM QUA';
     return `${daysAgo} NGÀY TRƯỚC`;
   };
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-linear-to-br from-indigo-50 to-purple-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#6366F1] mx-auto mb-4"></div>
+          <p className="text-gray-600">Đang tải sản phẩm mới...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="min-h-screen bg-linear-to-br from-indigo-50 to-purple-50 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-500 mb-4">Lỗi: {error}</p>
+          <p className="text-gray-600">Vui lòng kiểm tra kết nối API</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-linear-to-br from-indigo-50 to-purple-50">

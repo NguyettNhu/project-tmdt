@@ -1,11 +1,21 @@
 // app/page.tsx
 import ProductCard from '@/components/ProductCard';
-import { getAllProducts } from '@/lib/products';
+import { getProducts, mapApiProductToProduct, getImageUrl } from '@/lib/api';
 import Link from 'next/link';
 
-export default function HomePage() {
-  const products = getAllProducts();
-  const featuredProducts = products.filter(p => p.featured).slice(0, 8);
+export default async function HomePage() {
+  let featuredProducts: Array<{id: number; name: string; price: number; originalPrice?: number; image: string; featured?: boolean}> = [];
+  
+  try {
+    const apiProducts = await getProducts();
+    featuredProducts = apiProducts.slice(0, 8).map(p => ({
+      ...mapApiProductToProduct(p),
+      image: getImageUrl(p.avatar),
+    }));
+  } catch (error) {
+    console.error('Failed to fetch products:', error);
+    // Show empty state if API fails
+  }
 
   return (
     <div className="flex flex-col w-full">
@@ -80,6 +90,7 @@ export default function HomePage() {
                   id={product.id}
                   name={product.name}
                   price={product.price}
+                  originalPrice={product.originalPrice}
                   image={product.image}
                 />
               </div>

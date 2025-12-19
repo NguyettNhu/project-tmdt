@@ -3,18 +3,30 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import ProductCard from '@/components/ProductCard';
-import { products } from '@/lib/products';
+import { useProducts, useCategories } from '@/lib/hooks';
+import { mapApiProductToProduct, getImageUrl } from '@/lib/api';
 import { Home, Shirt, Layers, Wind, User, Scan, Square, Footprints, CircleUser, ShoppingBag, Heart, Sparkles } from 'lucide-react';
 
 export default function ShopContent() {
   const searchParams = useSearchParams();
+  const { products: apiProducts, loading, error } = useProducts();
+  const { categories: apiCategories } = useCategories();
+  
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [sortBy, setSortBy] = useState('featured');
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 300]);
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 10000000]);
   const [currentPage, setCurrentPage] = useState(1);
   const [showFilters, setShowFilters] = useState(false);
   const productsPerPage = 12;
+
+  // Convert API products to frontend format
+  const products = useMemo(() => {
+    return apiProducts.map(p => ({
+      ...mapApiProductToProduct(p),
+      image: getImageUrl(p.avatar),
+    }));
+  }, [apiProducts]);
 
   // Set search query from URL params
   useEffect(() => {
@@ -77,7 +89,7 @@ export default function ShopContent() {
     }
 
     return filtered;
-  }, [searchQuery, selectedCategory, sortBy, priceRange]);
+  }, [products, searchQuery, selectedCategory, sortBy, priceRange]);
 
   // Pagination
   const totalPages = Math.ceil(filteredAndSortedProducts.length / productsPerPage);
@@ -90,6 +102,30 @@ export default function ShopContent() {
   const handleFilterChange = () => {
     setCurrentPage(1);
   };
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
+        <div className="flex items-center justify-center py-20">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#D9006C]"></div>
+          <span className="ml-4 text-gray-600">Đang tải sản phẩm...</span>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
+        <div className="text-center py-20">
+          <p className="text-red-500 mb-4">Lỗi: {error}</p>
+          <p className="text-gray-600">Vui lòng kiểm tra kết nối API backend (http://localhost:8000)</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -319,6 +355,7 @@ export default function ShopContent() {
                     id={product.id}
                     name={product.name}
                     price={product.price}
+                    originalPrice={product.originalPrice}
                     image={product.image}
                   />
                 ))}

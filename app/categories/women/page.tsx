@@ -2,7 +2,8 @@
 
 import { useState, useMemo } from 'react';
 import Header from '@/components/Header';
-import { products } from '@/lib/products';
+import { useProductsByCategoryType } from '@/lib/hooks';
+import { mapApiProductToProduct, getImageUrl } from '@/lib/api';
 import { FaVenusMars, FaFilter, FaSortAmountDown, FaShoppingBag } from 'react-icons/fa';
 import { Shirt, ShoppingBag, Gem } from 'lucide-react';
 import Image from 'next/image';
@@ -10,10 +11,20 @@ import Image from 'next/image';
 type SortOption = 'featured' | 'price-low' | 'price-high' | 'name' | 'newest';
 
 export default function WomenCategoryPage() {
+  // Sử dụng hook mới để lấy sản phẩm theo category type "women"
+  const { products: apiProducts, loading, error } = useProductsByCategoryType('women');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [sortBy, setSortBy] = useState<SortOption>('featured');
   const [priceRange, setPriceRange] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Convert API products to frontend format
+  const products = useMemo(() => {
+    return apiProducts.map(p => ({
+      ...mapApiProductToProduct(p),
+      image: getImageUrl(p.avatar),
+    }));
+  }, [apiProducts]);
 
   const categories = [
     'all',
@@ -80,7 +91,31 @@ export default function WomenCategoryPage() {
     });
 
     return sorted;
-  }, [selectedCategory, priceRange, searchQuery, sortBy, priceRanges]);
+  }, [products, selectedCategory, priceRange, searchQuery, sortBy, priceRanges]);
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-linear-to-br from-pink-50 to-purple-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#D9006C] mx-auto mb-4"></div>
+          <p className="text-gray-600">Đang tải sản phẩm...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="min-h-screen bg-linear-to-br from-pink-50 to-purple-50 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-500 mb-4">Lỗi: {error}</p>
+          <p className="text-gray-600">Vui lòng kiểm tra kết nối API</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-linear-to-br from-pink-50 to-purple-50">

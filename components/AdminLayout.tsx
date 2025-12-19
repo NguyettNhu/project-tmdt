@@ -86,12 +86,20 @@ const menuItems = [
   },
 ];
 
+// Helper function to get admin image URL
+function getAdminImageUrl(imagePath: string | null | undefined): string | undefined {
+  if (!imagePath) return undefined;
+  if (imagePath.startsWith('http')) return imagePath;
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'http://localhost:8000';
+  return `${baseUrl}/storage/uploads/user/${imagePath}`;
+}
+
 export default function AdminLayout({ children }: AdminLayoutProps) {
   const pathname = usePathname();
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
-  const [adminUser, setAdminUser] = useState<{ name: string; email: string; role: string } | null>(null);
+  const [adminUser, setAdminUser] = useState<{ name: string; email: string; role: string; image?: string } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   // Check authentication on mount
@@ -239,7 +247,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             <DropdownMenu>
               <DropdownMenuTrigger className="flex items-center space-x-2 focus:outline-none hover:bg-gray-50 rounded-lg p-2 transition-colors">
                 <Avatar className="border-2 border-pink-100">
-                  <AvatarImage src="/images/admin-avatar.jpg" />
+                  <AvatarImage src={getAdminImageUrl(adminUser?.image)} />
                   <AvatarFallback className="bg-linear-to-br from-pink-400 to-purple-500 text-white">
                     {adminUser?.name?.charAt(0) || 'A'}
                   </AvatarFallback>
@@ -255,7 +263,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                 <DropdownMenuLabel>
                   <div className="flex items-center gap-3 py-2">
                     <Avatar className="w-10 h-10">
-                      <AvatarImage src="/images/admin-avatar.jpg" />
+                      <AvatarImage src={getAdminImageUrl(adminUser?.image)} />
                       <AvatarFallback className="bg-linear-to-br from-pink-400 to-purple-500 text-white">
                         {adminUser?.name?.charAt(0) || 'A'}
                       </AvatarFallback>

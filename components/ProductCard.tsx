@@ -2,25 +2,32 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
 import AddToCartButton from "./AddToCartButton";
 
 interface ProductCardProps {
   id: number;
   name: string;
   price: number;
+  originalPrice?: number; // Giá gốc trước khi giảm (từ API)
   image: string;
 }
 
-const formatPrice = (value: number, currency: "USD" | "VND" = "USD") =>
+const formatPrice = (value: number, currency: "USD" | "VND" = "VND") =>
   new Intl.NumberFormat(currency === "USD" ? "en-US" : "vi-VN", {
     style: "currency",
     currency,
     maximumFractionDigits: currency === "VND" ? 0 : 2,
   }).format(value);
 
-export default function ProductCard({ id, name, price, image }: ProductCardProps) {
-  const compareAt = price * 1.2;
-  const discount = Math.round(((compareAt - price) / compareAt) * 100);
+export default function ProductCard({ id, name, price, originalPrice, image }: ProductCardProps) {
+  const [imgError, setImgError] = useState(false);
+  
+  // Chỉ tính giảm giá khi có originalPrice thực từ API và originalPrice > price
+  const hasDiscount = originalPrice && originalPrice > price;
+  const discount = hasDiscount 
+    ? Math.round(((originalPrice - price) / originalPrice) * 100) 
+    : 0;
 
   return (
     <article className="group relative flex flex-col h-full bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-[0_12px_40px_rgba(217,0,108,0.12)] hover:border-pink-100 transition-all duration-500 ease-out hover:-translate-y-1">
@@ -48,14 +55,22 @@ export default function ProductCard({ id, name, price, image }: ProductCardProps
         aria-label={`Xem chi tiết ${name}`}
       >
         <div className="relative w-full aspect-[4/5]">
-          <Image
-            src={image}
-            alt={name}
-            fill
-            sizes="(max-width:640px) 50vw, (max-width:1024px) 33vw, 25vw"
-            className="object-cover transition-all duration-700 ease-out group-hover:scale-110"
-            priority={id <= 4}
-          />
+          {!imgError ? (
+            <Image
+              src={image}
+              alt={name}
+              fill
+              sizes="(max-width:640px) 50vw, (max-width:1024px) 33vw, 25vw"
+              className="object-cover transition-all duration-700 ease-out group-hover:scale-110"
+              priority={id <= 4}
+              unoptimized={image.startsWith('http://localhost') || image.startsWith('http://127.0.0.1')}
+              onError={() => setImgError(true)}
+            />
+          ) : (
+            <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
+              <span className="text-4xl">👕</span>
+            </div>
+          )}
           
           {/* Overlay gradient khi hover */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
@@ -94,11 +109,13 @@ export default function ProductCard({ id, name, price, image }: ProductCardProps
         {/* Giá */}
         <div className="flex items-baseline gap-2.5 mb-5">
           <span className="text-xl font-bold bg-gradient-to-r from-[#D9006C] to-[#FF1A7A] bg-clip-text text-transparent">
-            {formatPrice(price, "USD")}
+            {formatPrice(price, "VND")}
           </span>
-          <span className="text-sm text-gray-300 line-through font-medium">
-            {formatPrice(compareAt, "USD")}
-          </span>
+          {hasDiscount && (
+            <span className="text-sm text-gray-300 line-through font-medium">
+              {formatPrice(originalPrice, "VND")}
+            </span>
+          )}
         </div>
 
         {/* Nút thêm vào giỏ - luôn ở cuối card */}

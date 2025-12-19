@@ -1,99 +1,46 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { Calendar, User, ArrowRight, Search, Tag } from 'lucide-react';
+import { usePosts } from '@/lib/hooks';
+import { getImageUrl } from '@/lib/api';
 
-// Mock data cho tin tức
-const newsArticles = [
-  {
-    id: 1,
-    title: 'Xu hướng thời trang Xuân Hè 2025: Những gam màu pastel lên ngôi',
-    excerpt: 'Khám phá những xu hướng thời trang hot nhất mùa Xuân Hè 2025 với sự trở lại mạnh mẽ của các gam màu pastel nhẹ nhàng, thanh lịch.',
-    content: 'Nội dung đầy đủ của bài viết...',
-    image: '/images/news-1.jpg',
-    category: 'Xu hướng',
-    author: 'Nguyễn Thị Mai',
-    date: '2025-03-15',
-    readTime: '5 phút đọc',
-    featured: true,
-  },
-  {
-    id: 2,
-    title: 'Cách phối đồ công sở thanh lịch cho phái đẹp',
-    excerpt: 'Hướng dẫn chi tiết cách mix & match trang phục công sở vừa chuyên nghiệp vừa thời thượng cho các nàng công sở.',
-    content: 'Nội dung đầy đủ của bài viết...',
-    image: '/images/news-2.jpg',
-    category: 'Hướng dẫn',
-    author: 'Trần Văn Hùng',
-    date: '2025-03-12',
-    readTime: '7 phút đọc',
-    featured: true,
-  },
-  {
-    id: 3,
-    title: 'Top 10 phụ kiện không thể thiếu trong tủ đồ mùa hè',
-    excerpt: 'Điểm danh những món phụ kiện must-have giúp bạn tỏa sáng trong mùa hè năm nay.',
-    content: 'Nội dung đầy đủ của bài viết...',
-    image: '/images/news-3.jpg',
-    category: 'Phụ kiện',
-    author: 'Lê Thị Hương',
-    date: '2025-03-10',
-    readTime: '4 phút đọc',
-    featured: false,
-  },
-  {
-    id: 4,
-    title: 'Bí quyết chọn size quần áo online không bao giờ sai',
-    excerpt: 'Những mẹo hay giúp bạn chọn đúng size khi mua sắm online, tránh tình trạng đổi trả phiền phức.',
-    content: 'Nội dung đầy đủ của bài viết...',
-    image: '/images/news-4.jpg',
-    category: 'Mẹo hay',
-    author: 'Phạm Minh Tuấn',
-    date: '2025-03-08',
-    readTime: '6 phút đọc',
-    featured: false,
-  },
-  {
-    id: 5,
-    title: 'STYLA ra mắt BST mới: "Urban Chic" - Phong cách đô thị hiện đại',
-    excerpt: 'Giới thiệu bộ sưu tập mới nhất của STYLA với những thiết kế mang đậm phong cách đô thị năng động.',
-    content: 'Nội dung đầy đủ của bài viết...',
-    image: '/images/news-5.jpg',
-    category: 'Bộ sưu tập',
-    author: 'STYLA Team',
-    date: '2025-03-05',
-    readTime: '3 phút đọc',
-    featured: true,
-  },
-  {
-    id: 6,
-    title: 'Chương trình khuyến mãi lớn nhất năm - Sale up to 50%',
-    excerpt: 'Đừng bỏ lỡ cơ hội sở hữu những item thời trang yêu thích với mức giá siêu hấp dẫn.',
-    content: 'Nội dung đầy đủ của bài viết...',
-    image: '/images/news-6.jpg',
-    category: 'Khuyến mãi',
-    author: 'STYLA Team',
-    date: '2025-03-01',
-    readTime: '2 phút đọc',
-    featured: false,
-  },
-];
-
-const categories = ['Tất cả', 'Xu hướng', 'Hướng dẫn', 'Phụ kiện', 'Mẹo hay', 'Bộ sưu tập', 'Khuyến mãi'];
+const categories = ['Tất cả', 'Tin tức', 'Xu hướng', 'Hướng dẫn', 'Phụ kiện', 'Mẹo hay', 'Bộ sưu tập', 'Khuyến mãi'];
 
 export default function NewsPage() {
+  const { posts: apiPosts, loading, error } = usePosts();
   const [selectedCategory, setSelectedCategory] = useState('Tất cả');
   const [searchQuery, setSearchQuery] = useState('');
 
-  const filteredArticles = newsArticles.filter((article) => {
-    const matchCategory = selectedCategory === 'Tất cả' || article.category === selectedCategory;
-    const matchSearch = article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                       article.excerpt.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchCategory && matchSearch;
-  });
+  // Map API posts to articles format
+  const newsArticles = useMemo(() => {
+    return apiPosts.map(post => ({
+      id: post.id,
+      title: post.name,
+      excerpt: post.description || 'Xem chi tiết bài viết...',
+      content: post.content || '',
+      image: getImageUrl(post.image, 'post'),
+      category: 'Tin tức', // Default category since API doesn't have category
+      author: 'STYLA Team',
+      date: post.created_at,
+      readTime: '5 phút đọc',
+      featured: post.status === 1,
+    }));
+  }, [apiPosts]);
 
-  const featuredArticles = newsArticles.filter(article => article.featured);
+  const filteredArticles = useMemo(() => {
+    return newsArticles.filter((article) => {
+      const matchCategory = selectedCategory === 'Tất cả' || article.category === selectedCategory;
+      const matchSearch = article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         article.excerpt.toLowerCase().includes(searchQuery.toLowerCase());
+      return matchCategory && matchSearch;
+    });
+  }, [newsArticles, selectedCategory, searchQuery]);
+
+  const featuredArticles = useMemo(() => {
+    return newsArticles.filter(article => article.featured).slice(0, 3);
+  }, [newsArticles]);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -104,10 +51,34 @@ export default function NewsPage() {
     });
   };
 
+  // Loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500 mx-auto mb-4"></div>
+          <p className="text-gray-600">Đang tải bài viết...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-500 mb-4">Lỗi: {error}</p>
+          <p className="text-gray-600">Vui lòng kiểm tra kết nối API</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-pink-500 to-purple-600 text-white py-16">
+      <section className="bg-linear-to-r from-pink-500 to-purple-600 text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h1 className="text-4xl md:text-5xl font-bold mb-4">Tin Tức & Blog</h1>
@@ -163,7 +134,7 @@ export default function NewsPage() {
                   className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300"
                 >
                   <div className="relative h-48 overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-br from-pink-400 to-purple-500 flex items-center justify-center">
+                    <div className="absolute inset-0 bg-linear-to-br from-pink-400 to-purple-500 flex items-center justify-center">
                       <span className="text-white text-6xl">📰</span>
                     </div>
                     <div className="absolute top-4 left-4">
@@ -226,7 +197,7 @@ export default function NewsPage() {
                   className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300"
                 >
                   <div className="relative h-48 overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
+                    <div className="absolute inset-0 bg-linear-to-br from-gray-200 to-gray-300 flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
                       <span className="text-gray-400 text-5xl">📄</span>
                     </div>
                   </div>
@@ -260,7 +231,7 @@ export default function NewsPage() {
         </section>
 
         {/* Newsletter Section */}
-        <section className="mt-16 bg-gradient-to-r from-pink-500 to-purple-600 rounded-3xl p-8 md:p-12 text-white">
+        <section className="mt-16 bg-linear-to-r from-pink-500 to-purple-600 rounded-3xl p-8 md:p-12 text-white">
           <div className="max-w-2xl mx-auto text-center">
             <h2 className="text-2xl md:text-3xl font-bold mb-4">
               Đăng ký nhận tin mới nhất

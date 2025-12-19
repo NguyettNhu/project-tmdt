@@ -2,16 +2,28 @@
 
 import { useState, useMemo } from 'react';
 import Header from '@/components/Header';
-import { products } from '@/lib/products';
+import { useProducts } from '@/lib/hooks';
+import { mapApiProductToProduct, getImageUrl } from '@/lib/api';
 import { FaTag, FaFire, FaClock, FaPercent, FaFilter, FaSortAmountDown } from 'react-icons/fa';
 import Image from 'next/image';
 
 type SortOption = 'discount' | 'price-low' | 'price-high' | 'name';
 
 export default function SalePage() {
+  const { products: apiProducts, loading, error } = useProducts();
   const [selectedDiscount, setSelectedDiscount] = useState<string>('all');
   const [sortBy, setSortBy] = useState<SortOption>('discount');
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Convert API products to frontend format
+  const products = useMemo(() => {
+    return apiProducts.map(p => ({
+      ...mapApiProductToProduct(p),
+      image: getImageUrl(p.avatar),
+      apiSalePrice: p.sale_price,
+      apiPrice: p.price,
+    }));
+  }, [apiProducts]);
 
   const discountRanges = useMemo(() => [
     { id: 'all', label: 'Tất cả', min: 0, max: 100 },
@@ -21,32 +33,29 @@ export default function SalePage() {
     { id: '60+', label: '60% trở lên', min: 60, max: 100 }
   ], []);
 
-  // Generate sale prices (30-70% off) - using product ID as seed for consistent discounts
+  // Get products on sale - those with sale_price set
   const saleProducts = useMemo(() => {
-    return products.map(product => {
-      // Use product ID to generate consistent discount (not random)
-      const seed = product.id * 7 + 13; // Simple seeding
-      const discountPercent = product.featured 
-        ? 50 + (seed % 21) // 50-70% for featured
-        : 30 + (seed % 31); // 30-60% for others
-      
-      const originalPrice = product.price;
-      const salePrice = Math.round(originalPrice * (1 - discountPercent / 100));
-      
-      // Use product ID to generate consistent end date
-      const daysUntilEnd = 1 + (product.id % 7); // 1-7 days
-      const saleEndDate = new Date();
-      saleEndDate.setDate(saleEndDate.getDate() + daysUntilEnd);
-      
-      return {
-        ...product,
-        originalPrice,
-        salePrice,
-        discountPercent,
-        saleEndDate
-      };
-    });
-  }, []);
+    return products
+      .filter(product => product.apiSalePrice && product.apiSalePrice < product.apiPrice)
+      .map(product => {
+        const originalPrice = product.apiPrice;
+        const salePrice = product.apiSalePrice!;
+        const discountPercent = Math.round(((originalPrice - salePrice) / originalPrice) * 100);
+        
+        // Generate end date based on product id for consistency
+        const daysUntilEnd = 1 + (product.id % 7);
+        const saleEndDate = new Date();
+        saleEndDate.setDate(saleEndDate.getDate() + daysUntilEnd);
+        
+        return {
+          ...product,
+          originalPrice,
+          salePrice,
+          discountPercent,
+          saleEndDate
+        };
+      });
+  }, [products]);
 
   const filteredAndSortedProducts = useMemo(() => {
     let filtered = saleProducts;
@@ -110,6 +119,30 @@ export default function SalePage() {
       0
     );
   }, [filteredAndSortedProducts]);
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-linear-to-br from-pink-50 to-purple-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#D9006C] mx-auto mb-4"></div>
+          <p className="text-gray-600">Đang tải sản phẩm sale...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="min-h-screen bg-linear-to-br from-pink-50 to-purple-50 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-500 mb-4">Lỗi: {error}</p>
+          <p className="text-gray-600">Vui lòng kiểm tra kết nối API</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-linear-to-br from-pink-50 to-purple-50">

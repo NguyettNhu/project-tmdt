@@ -2,22 +2,33 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { getCurrentUser, logoutUser, saveCurrentUser, type User } from '@/lib/auth';
+import { useAuth } from '@/lib/AuthContext';
 import { getOrdersByUserId, getOrderStats, getStatusLabel, getStatusColor, formatCurrency, formatDate, type Order } from '@/lib/orders';
 import { toast } from 'sonner';
 import Link from 'next/link';
 import Image from 'next/image';
 import { User as UserIcon, Mail, ShoppingBag, Store, LogOut, Edit, Package, Heart, Settings, Phone, MapPin, Calendar, TrendingUp, Clock, CheckCircle, Truck, XCircle } from 'lucide-react';
+import { getImageUrl } from '@/lib/api';
+
+// Define the Customer type for editing
+interface EditableCustomer {
+  id: number;
+  name: string;
+  email: string;
+  phone: string | null;
+  address: string | null;
+  image: string | null;
+}
 
 export default function ProfilePage() {
   const router = useRouter();
-  const [user, setUser] = useState<User | null>(null);
+  const { customer, isAuthenticated, loading: authLoading, logout, updateProfile } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'info' | 'orders' | 'wishlist' | 'settings'>('info');
   const [orders, setOrders] = useState<Order[]>([]);
   const [orderFilter, setOrderFilter] = useState<'all' | 'pending' | 'confirmed' | 'shipping' | 'delivered' | 'cancelled'>('all');
   const [isEditing, setIsEditing] = useState(false);
-  const [editedUser, setEditedUser] = useState<User | null>(null);
+  const [editedCustomer, setEditedCustomer] = useState<EditableCustomer | null>(null);
   const [settingsView, setSettingsView] = useState<'main' | 'password' | 'notifications' | 'privacy' | 'delete'>('main');
   const [passwordData, setPasswordData] = useState({
     currentPassword: '',
@@ -40,49 +51,74 @@ export default function ProfilePage() {
 
   useEffect(() => {
     const loadUserData = () => {
-      const currentUser = getCurrentUser();
-      if (!currentUser) {
+      if (authLoading) return; // Wait for auth to load
+      
+      if (!isAuthenticated || !customer) {
         toast.error('Vui lòng đăng nhập để tiếp tục');
         router.push('/auth/login');
         return;
       }
-      setUser(currentUser);
-      setEditedUser(currentUser);
       
-      // Load user orders
-      const userOrders = getOrdersByUserId(currentUser.id);
+      setEditedCustomer({
+        id: customer.id,
+        name: customer.name,
+        email: customer.email,
+        phone: customer.phone,
+        address: customer.address,
+        image: customer.image,
+      });
+      
+      // Load user orders (mock for now - can be connected to API later)
+      const userOrders = getOrdersByUserId(customer.id.toString());
       setOrders(userOrders);
       
       setIsLoading(false);
     };
     
     loadUserData();
-  }, [router]);
+  }, [router, customer, isAuthenticated, authLoading]);
 
-  const handleLogout = () => {
-    logoutUser();
+  const handleLogout = async () => {
+    await logout();
     toast.success('Đăng xuất thành công');
     router.push('/');
   };
 
-  const handleSaveProfile = () => {
-    if (!editedUser) return;
+  const handleSaveProfile = async () => {
+    if (!editedCustomer) return;
     
     // Validate phone number
-    if (editedUser.phone && !/^[0-9]{10}$/.test(editedUser.phone)) {
+    if (editedCustomer.phone && !/^[0-9]{10}$/.test(editedCustomer.phone)) {
       toast.error('Số điện thoại không hợp lệ');
       return;
     }
     
-    // Save to localStorage
-    saveCurrentUser(editedUser);
-    setUser(editedUser);
-    setIsEditing(false);
-    toast.success('Cập nhật thông tin thành công');
+    // Call API to update profile
+    const result = await updateProfile({
+      name: editedCustomer.name,
+      phone: editedCustomer.phone,
+      address: editedCustomer.address,
+    });
+    
+    if (result.success) {
+      setIsEditing(false);
+      toast.success('Cập nhật thông tin thành công');
+    } else {
+      toast.error(result.message);
+    }
   };
 
   const handleCancelEdit = () => {
-    setEditedUser(user);
+    if (customer) {
+      setEditedCustomer({
+        id: customer.id,
+        name: customer.name,
+        email: customer.email,
+        phone: customer.phone,
+        address: customer.address,
+        image: customer.image,
+      });
+    }
     setIsEditing(false);
   };
 
@@ -90,9 +126,9 @@ export default function ProfilePage() {
     ? orders 
     : orders.filter(order => order.status === orderFilter);
 
-  const stats = user ? getOrderStats(user.id) : null;
+  const stats = customer ? getOrderStats(customer.id.toString()) : null;
 
-  if (isLoading) {
+  if (isLoading || authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="animate-spin rounded-full h-12 w-12 border-4 border-purple-500 border-t-transparent"></div>
@@ -100,7 +136,7 @@ export default function ProfilePage() {
     );
   }
 
-  if (!user) return null;
+  if (!customer) return null;
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
@@ -110,60 +146,48 @@ export default function ProfilePage() {
           <div className="flex flex-col md:flex-row items-center gap-6">
             {/* Avatar */}
             <div className="relative">
-              {user.avatar ? (
+              {customer.image ? (
                 <Image
-                  src={user.avatar}
-                  alt={user.fullName}
+                  src={getImageUrl(customer.image, 'customer')}
+                  alt={customer.name}
                   width={120}
                   height={120}
                   className="rounded-full border-4 border-purple-100"
                 />
               ) : (
                 <div className="w-32 h-32 rounded-full bg-linear-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white text-4xl font-bold">
-                  {user.fullName.charAt(0)}
+                  {customer.name.charAt(0)}
                 </div>
               )}
-              {/* Role Badge */}
-              <div className={`absolute bottom-0 right-0 px-3 py-1 rounded-full text-xs font-bold text-white shadow-lg ${
-                user.role === 'seller' ? 'bg-blue-500' : 'bg-green-500'
-              }`}>
-                {user.role === 'seller' ? (
-                  <span className="flex items-center gap-1">
-                    <Store className="w-3 h-3" />
-                    Người bán
-                  </span>
-                ) : (
-                  <span className="flex items-center gap-1">
-                    <ShoppingBag className="w-3 h-3" />
-                    Người mua
-                  </span>
-                )}
+              {/* Customer Badge */}
+              <div className="absolute bottom-0 right-0 px-3 py-1 rounded-full text-xs font-bold text-white shadow-lg bg-green-500">
+                <span className="flex items-center gap-1">
+                  <ShoppingBag className="w-3 h-3" />
+                  Khách hàng
+                </span>
               </div>
             </div>
 
             {/* User Info */}
             <div className="flex-1 text-center md:text-left">
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">{user.fullName}</h1>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">{customer.name}</h1>
               <p className="text-gray-600 flex items-center justify-center md:justify-start gap-2 mb-2">
                 <Mail className="w-4 h-4" />
-                {user.email}
+                {customer.email}
               </p>
-              {user.phone && (
+              {customer.phone && (
                 <p className="text-gray-600 flex items-center justify-center md:justify-start gap-2 mb-2">
                   <Phone className="w-4 h-4" />
-                  {user.phone}
+                  {customer.phone}
                 </p>
               )}
-              {user.joinDate && (
-                <p className="text-gray-500 text-sm flex items-center justify-center md:justify-start gap-2 mb-4">
-                  <Calendar className="w-4 h-4" />
-                  Tham gia từ {new Date(user.joinDate).toLocaleDateString('vi-VN')}
+              {customer.address && (
+                <p className="text-gray-600 flex items-center justify-center md:justify-start gap-2 mb-4">
+                  <MapPin className="w-4 h-4" />
+                  {customer.address}
                 </p>
               )}
               <div className="flex flex-wrap gap-2 justify-center md:justify-start">
-                <span className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm font-medium">
-                  @{user.username}
-                </span>
                 <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium">
                   ✓ Tài khoản đã xác thực
                 </span>
@@ -271,7 +295,7 @@ export default function ProfilePage() {
 
           {/* Tab Content */}
           <div className="p-8">
-            {activeTab === 'info' && editedUser && (
+            {activeTab === 'info' && editedCustomer && (
               <div className="space-y-6">
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-2xl font-bold text-gray-900">Thông tin cá nhân</h2>
@@ -308,8 +332,8 @@ export default function ProfilePage() {
                     </label>
                     <input
                       type="text"
-                      value={editedUser.fullName}
-                      onChange={(e) => setEditedUser({...editedUser, fullName: e.target.value})}
+                      value={editedCustomer.name}
+                      onChange={(e) => setEditedCustomer({...editedCustomer, name: e.target.value})}
                       disabled={!isEditing}
                       className={`w-full px-4 py-3 border-2 border-gray-200 rounded-xl ${isEditing ? 'bg-white' : 'bg-gray-50'} text-gray-900 focus:border-purple-500 focus:outline-none`}
                     />
@@ -321,7 +345,7 @@ export default function ProfilePage() {
                     </label>
                     <input
                       type="email"
-                      value={editedUser.email}
+                      value={editedCustomer.email}
                       disabled
                       className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 text-gray-900"
                     />
@@ -333,23 +357,11 @@ export default function ProfilePage() {
                     </label>
                     <input
                       type="tel"
-                      value={editedUser.phone || ''}
-                      onChange={(e) => setEditedUser({...editedUser, phone: e.target.value})}
+                      value={editedCustomer.phone || ''}
+                      onChange={(e) => setEditedCustomer({...editedCustomer, phone: e.target.value})}
                       disabled={!isEditing}
                       placeholder="0901234567"
                       className={`w-full px-4 py-3 border-2 border-gray-200 rounded-xl ${isEditing ? 'bg-white' : 'bg-gray-50'} text-gray-900 focus:border-purple-500 focus:outline-none`}
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Username
-                    </label>
-                    <input
-                      type="text"
-                      value={editedUser.username}
-                      disabled
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 text-gray-900"
                     />
                   </div>
 
@@ -359,101 +371,25 @@ export default function ProfilePage() {
                     </label>
                     <input
                       type="text"
-                      value={editedUser.address || ''}
-                      onChange={(e) => setEditedUser({...editedUser, address: e.target.value})}
+                      value={editedCustomer.address || ''}
+                      onChange={(e) => setEditedCustomer({...editedCustomer, address: e.target.value})}
                       disabled={!isEditing}
-                      placeholder="123 Nguyễn Huệ"
+                      placeholder="123 Nguyễn Huệ, Quận 1, TP. Hồ Chí Minh"
                       className={`w-full px-4 py-3 border-2 border-gray-200 rounded-xl ${isEditing ? 'bg-white' : 'bg-gray-50'} text-gray-900 focus:border-purple-500 focus:outline-none`}
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Phường/Xã
-                    </label>
-                    <input
-                      type="text"
-                      value={editedUser.ward || ''}
-                      onChange={(e) => setEditedUser({...editedUser, ward: e.target.value})}
-                      disabled={!isEditing}
-                      placeholder="Phường Bến Nghé"
-                      className={`w-full px-4 py-3 border-2 border-gray-200 rounded-xl ${isEditing ? 'bg-white' : 'bg-gray-50'} text-gray-900 focus:border-purple-500 focus:outline-none`}
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Quận/Huyện
-                    </label>
-                    <input
-                      type="text"
-                      value={editedUser.district || ''}
-                      onChange={(e) => setEditedUser({...editedUser, district: e.target.value})}
-                      disabled={!isEditing}
-                      placeholder="Quận 1"
-                      className={`w-full px-4 py-3 border-2 border-gray-200 rounded-xl ${isEditing ? 'bg-white' : 'bg-gray-50'} text-gray-900 focus:border-purple-500 focus:outline-none`}
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Tỉnh/Thành phố
-                    </label>
-                    <input
-                      type="text"
-                      value={editedUser.city || ''}
-                      onChange={(e) => setEditedUser({...editedUser, city: e.target.value})}
-                      disabled={!isEditing}
-                      placeholder="TP. Hồ Chí Minh"
-                      className={`w-full px-4 py-3 border-2 border-gray-200 rounded-xl ${isEditing ? 'bg-white' : 'bg-gray-50'} text-gray-900 focus:border-purple-500 focus:outline-none`}
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Vai trò
-                    </label>
-                    <input
-                      type="text"
-                      value={editedUser.role === 'seller' ? 'Người bán' : 'Người mua'}
-                      disabled
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 text-gray-900"
                     />
                   </div>
                 </div>
 
                 {/* Full Address Display */}
-                {(editedUser.address || editedUser.ward || editedUser.district || editedUser.city) && (
+                {editedCustomer.address && (
                   <div className="mt-6 p-4 bg-purple-50 border-2 border-purple-200 rounded-xl">
                     <div className="flex items-start gap-3">
                       <MapPin className="w-5 h-5 text-purple-600 mt-0.5" />
                       <div>
-                        <p className="font-semibold text-gray-900 mb-1">Địa chỉ đầy đủ:</p>
-                        <p className="text-gray-700">
-                          {[editedUser.address, editedUser.ward, editedUser.district, editedUser.city]
-                            .filter(Boolean)
-                            .join(', ')}
-                        </p>
+                        <p className="font-semibold text-gray-900 mb-1">Địa chỉ:</p>
+                        <p className="text-gray-700">{editedCustomer.address}</p>
                       </div>
                     </div>
-                  </div>
-                )}
-
-                {user.role === 'seller' && (
-                  <div className="mt-8 p-6 bg-blue-50 border-2 border-blue-200 rounded-xl">
-                    <h3 className="text-lg font-bold text-blue-900 mb-2 flex items-center gap-2">
-                      <Store className="w-5 h-5" />
-                      Tài khoản người bán
-                    </h3>
-                    <p className="text-blue-700 mb-4">
-                      Bạn có thể quản lý sản phẩm, đơn hàng và cửa hàng của mình
-                    </p>
-                    <Link
-                      href="/seller/dashboard"
-                      className="inline-block px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors font-semibold"
-                    >
-                      Đi tới Dashboard
-                    </Link>
                   </div>
                 )}
               </div>

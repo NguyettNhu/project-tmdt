@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import AdminLayout from '@/components/AdminLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -22,137 +22,114 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Edit, Trash2, Eye, Plus, Search, ToggleLeft, ToggleRight } from 'lucide-react';
-
-interface Product {
-  id: string;
-  name: string;
-  image: string;
-  originalPrice: number;
-  salePrice: number;
-  sold: number;
-  category: string;
-  createdAt: string;
-  isActive: boolean;
-}
-
-const mockProducts: Product[] = [
-  { 
-    id: 'SP001', 
-    name: 'Áo thun basic trắng', 
-    image: '/images/product1.jpg',
-    originalPrice: 250000,
-    salePrice: 200000,
-    sold: 156,
-    category: 'Áo',
-    createdAt: '2025-01-15',
-    isActive: true
-  },
-  { 
-    id: 'SP002', 
-    name: 'Quần jean slim fit xanh đậm', 
-    image: '/images/product2.jpg',
-    originalPrice: 550000,
-    salePrice: 450000,
-    sold: 89,
-    category: 'Quần',
-    createdAt: '2025-01-20',
-    isActive: true
-  },
-  { 
-    id: 'SP003', 
-    name: 'Giày sneaker trắng classic', 
-    image: '/images/product3.jpg',
-    originalPrice: 800000,
-    salePrice: 650000,
-    sold: 234,
-    category: 'Giày',
-    createdAt: '2025-02-01',
-    isActive: true
-  },
-  { 
-    id: 'SP004', 
-    name: 'Túi xách nữ da cao cấp', 
-    image: '/images/product4.jpg',
-    originalPrice: 450000,
-    salePrice: 350000,
-    sold: 67,
-    category: 'Phụ kiện',
-    createdAt: '2025-02-10',
-    isActive: true
-  },
-  { 
-    id: 'SP005', 
-    name: 'Mũ lưỡi trai thể thao', 
-    image: '/images/product5.jpg',
-    originalPrice: 180000,
-    salePrice: 150000,
-    sold: 45,
-    category: 'Phụ kiện',
-    createdAt: '2025-02-15',
-    isActive: false
-  },
-  { 
-    id: 'SP006', 
-    name: 'Áo sơ mi công sở nam', 
-    image: '/images/product6.jpg',
-    originalPrice: 380000,
-    salePrice: 320000,
-    sold: 112,
-    category: 'Áo',
-    createdAt: '2025-02-20',
-    isActive: true
-  },
-  { 
-    id: 'SP007', 
-    name: 'Váy đầm nữ dự tiệc', 
-    image: '/images/product7.jpg',
-    originalPrice: 650000,
-    salePrice: 520000,
-    sold: 78,
-    category: 'Váy',
-    createdAt: '2025-03-01',
-    isActive: true
-  },
-];
-
-const categories = [
-  { id: 'CAT001', name: 'Áo' },
-  { id: 'CAT002', name: 'Quần' },
-  { id: 'CAT003', name: 'Váy' },
-  { id: 'CAT004', name: 'Giày' },
-  { id: 'CAT005', name: 'Phụ kiện' },
-  { id: 'CAT006', name: 'Nam' },
-  { id: 'CAT007', name: 'Nữ' },
-];
+import { Edit, Trash2, Eye, Plus, Search, ToggleLeft, ToggleRight, Loader2, ImageOff } from 'lucide-react';
+import SafeImage from '@/components/SafeImage';
+import { useAdminProducts, useCategories } from '@/lib/hooks';
+import { getImageUrl, ApiProduct, createProduct, updateProduct, deleteProduct, toggleProductStatus } from '@/lib/api';
+import { toast } from 'sonner';
 
 export default function ProductsPage() {
-  const [products, setProducts] = useState<Product[]>(mockProducts);
+  const { products: apiProducts, loading, refetch } = useAdminProducts();
+  const { categories: apiCategories } = useCategories();
   const [searchTerm, setSearchTerm] = useState('');
   const [isProductDialogOpen, setIsProductDialogOpen] = useState(false);
-  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [editingProduct, setEditingProduct] = useState<ApiProduct | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // Form refs
+  const nameRef = useRef<HTMLInputElement>(null);
+  const categoryRef = useRef<HTMLSelectElement>(null);
+  const priceRef = useRef<HTMLInputElement>(null);
+  const salePriceRef = useRef<HTMLInputElement>(null);
+  const imageRef = useRef<HTMLInputElement>(null);
+  const descriptionRef = useRef<HTMLTextAreaElement>(null);
 
-  const handleDeleteProduct = (id: string) => {
-    if (confirm('Bạn có chắc muốn xóa sản phẩm này?')) {
-      setProducts(products.filter(p => p.id !== id));
+  const handleDeleteProduct = async (id: number) => {
+    if (!confirm('Bạn có chắc muốn xóa sản phẩm này?')) return;
+    
+    try {
+      await deleteProduct(id);
+      toast.success('Xóa sản phẩm thành công');
+      refetch();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Không thể xóa sản phẩm');
     }
   };
 
-  const handleToggleProductStatus = (id: string) => {
-    setProducts(products.map(p =>
-      p.id === id ? { ...p, isActive: !p.isActive } : p
-    ));
+  const handleToggleProductStatus = async (product: ApiProduct) => {
+    try {
+      const newStatus = product.status === 1 ? 0 : 1;
+      await toggleProductStatus(product.id, newStatus);
+      toast.success(newStatus === 1 ? 'Đã kích hoạt sản phẩm' : 'Đã ẩn sản phẩm');
+      refetch();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Không thể cập nhật trạng thái');
+    }
   };
 
-  const handleOpenProductDialog = (product?: Product) => {
+  const handleOpenProductDialog = (product?: ApiProduct) => {
     setEditingProduct(product || null);
     setIsProductDialogOpen(true);
   };
 
-  const filteredProducts = products.filter(product =>
+  const handleSubmitProduct = async () => {
+    const name = nameRef.current?.value?.trim();
+    const price = priceRef.current?.value;
+    
+    if (!name) {
+      toast.error('Vui lòng nhập tên sản phẩm');
+      return;
+    }
+    if (!price || Number(price) <= 0) {
+      toast.error('Vui lòng nhập giá hợp lệ');
+      return;
+    }
+    
+    setIsSubmitting(true);
+    
+    try {
+      const formData = new FormData();
+      formData.append('name', name);
+      formData.append('price', price);
+      
+      if (salePriceRef.current?.value) {
+        formData.append('sale_price', salePriceRef.current.value);
+      }
+      if (categoryRef.current?.value) {
+        formData.append('parent_id', categoryRef.current.value);
+      }
+      if (descriptionRef.current?.value) {
+        formData.append('description', descriptionRef.current.value);
+      }
+      
+      const imageFile = imageRef.current?.files?.[0];
+      if (imageFile) {
+        formData.append('avatar', imageFile);
+      }
+      
+      if (editingProduct) {
+        await updateProduct(editingProduct.id, formData);
+        toast.success('Cập nhật sản phẩm thành công');
+      } else {
+        await createProduct(formData);
+        toast.success('Thêm sản phẩm thành công');
+      }
+      
+      setIsProductDialogOpen(false);
+      refetch();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Có lỗi xảy ra');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const filteredProducts = apiProducts.filter(product =>
     product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    product.category.toLowerCase().includes(searchTerm.toLowerCase())
+    product.slug.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const productCategories = apiCategories.filter(c => c.type === 'product');
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
@@ -161,6 +138,16 @@ export default function ProductsPage() {
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('vi-VN');
   };
+
+  if (loading) {
+    return (
+      <AdminLayout>
+        <div className="flex items-center justify-center h-64">
+          <div className="w-8 h-8 border-4 border-pink-500 border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      </AdminLayout>
+    );
+  }
 
   return (
     <AdminLayout>
@@ -200,7 +187,6 @@ export default function ProductsPage() {
                     <TableHead className="font-semibold">Giá gốc</TableHead>
                     <TableHead className="font-semibold">Giá khuyến mãi</TableHead>
                     <TableHead className="font-semibold">Đã bán</TableHead>
-                    <TableHead className="font-semibold">Danh Mục</TableHead>
                     <TableHead className="font-semibold">Ngày Tạo</TableHead>
                     <TableHead className="font-semibold text-center">Kích Hoạt</TableHead>
                     <TableHead className="font-semibold text-center">Hành Động</TableHead>
@@ -209,93 +195,58 @@ export default function ProductsPage() {
                 <TableBody>
                   {filteredProducts.map((product) => (
                     <TableRow key={product.id} className="hover:bg-gray-50">
-                      {/* Avatar */}
                       <TableCell>
-                        <div className="w-14 h-14 bg-gradient-to-br from-pink-100 to-purple-100 rounded-lg flex items-center justify-center overflow-hidden border">
-                          <span className="text-2xl">👕</span>
+                        <div className="w-14 h-14 relative rounded-lg overflow-hidden border">
+                          <SafeImage 
+                            src={getImageUrl(product.avatar)} 
+                            alt={product.name} 
+                            fill 
+                            className="object-cover" 
+                            sizes="56px"
+                            fallbackElement={
+                              <div className="w-full h-full bg-gradient-to-br from-pink-100 to-purple-100 flex items-center justify-center">
+                                <ImageOff className="w-6 h-6 text-gray-400" />
+                              </div>
+                            }
+                          />
                         </div>
                       </TableCell>
-
-                      {/* Tên */}
                       <TableCell>
                         <div className="max-w-[200px]">
                           <p className="font-medium text-gray-900 truncate">{product.name}</p>
-                          <p className="text-xs text-gray-500">{product.id}</p>
+                          <p className="text-xs text-gray-500">ID: {product.id}</p>
                         </div>
                       </TableCell>
-
-                      {/* Giá gốc */}
                       <TableCell>
-                        <span className="text-gray-500 line-through">
-                          {formatPrice(product.originalPrice)}
-                        </span>
+                        <span className="text-gray-500 line-through">{formatPrice(product.price)}</span>
                       </TableCell>
-
-                      {/* Giá khuyến mãi */}
                       <TableCell>
-                        <span className="text-pink-600 font-semibold">
-                          {formatPrice(product.salePrice)}
-                        </span>
+                        <span className="text-pink-600 font-semibold">{formatPrice(product.sale_price || product.price)}</span>
                       </TableCell>
-
-                      {/* Đã bán */}
                       <TableCell>
                         <span className="font-medium">{product.sold}</span>
                       </TableCell>
-
-                      {/* Danh mục */}
                       <TableCell>
-                        <span className="px-2 py-1 bg-blue-50 text-blue-600 rounded-full text-sm">
-                          {product.category}
-                        </span>
+                        <span className="text-gray-600">{formatDate(product.created_at)}</span>
                       </TableCell>
-
-                      {/* Ngày tạo */}
-                      <TableCell>
-                        <span className="text-gray-600">{formatDate(product.createdAt)}</span>
-                      </TableCell>
-
-                      {/* Kích hoạt */}
                       <TableCell className="text-center">
-                        <button
-                          onClick={() => handleToggleProductStatus(product.id)}
-                          className="inline-flex items-center justify-center"
-                        >
-                          {product.isActive ? (
+                        <button onClick={() => handleToggleProductStatus(product)} className="inline-flex items-center justify-center">
+                          {product.status === 1 ? (
                             <ToggleRight className="w-8 h-8 text-green-500" />
                           ) : (
                             <ToggleLeft className="w-8 h-8 text-gray-400" />
                           )}
                         </button>
                       </TableCell>
-
-                      {/* Hành động */}
                       <TableCell>
                         <div className="flex items-center justify-center gap-1">
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            className="h-8 w-8 p-0 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-                            title="Xem chi tiết"
-                          >
+                          <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-blue-600 hover:text-blue-700 hover:bg-blue-50" title="Xem chi tiết">
                             <Eye className="w-4 h-4" />
                           </Button>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            className="h-8 w-8 p-0 text-amber-600 hover:text-amber-700 hover:bg-amber-50"
-                            onClick={() => handleOpenProductDialog(product)}
-                            title="Chỉnh sửa"
-                          >
+                          <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-amber-600 hover:text-amber-700 hover:bg-amber-50" onClick={() => handleOpenProductDialog(product)} title="Chỉnh sửa">
                             <Edit className="w-4 h-4" />
                           </Button>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
-                            onClick={() => handleDeleteProduct(product.id)}
-                            title="Xóa"
-                          >
+                          <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50" onClick={() => handleDeleteProduct(product.id)} title="Xóa">
                             <Trash2 className="w-4 h-4" />
                           </Button>
                         </div>
@@ -316,92 +267,57 @@ export default function ProductsPage() {
         </Card>
       </div>
 
-      {/* Product Dialog */}
       <Dialog open={isProductDialogOpen} onOpenChange={setIsProductDialogOpen}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>
-              {editingProduct ? 'Chỉnh sửa sản phẩm' : 'Thêm sản phẩm mới'}
-            </DialogTitle>
-            <DialogDescription>
-              Nhập thông tin sản phẩm
-            </DialogDescription>
+            <DialogTitle>{editingProduct ? 'Chỉnh sửa sản phẩm' : 'Thêm sản phẩm mới'}</DialogTitle>
+            <DialogDescription>Nhập thông tin sản phẩm</DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="name" className="text-right">
-                Tên sản phẩm
-              </Label>
-              <Input
-                id="name"
-                defaultValue={editingProduct?.name}
-                placeholder="Nhập tên sản phẩm"
-                className="col-span-3"
-              />
+              <Label htmlFor="name" className="text-right">Tên sản phẩm <span className="text-red-500">*</span></Label>
+              <Input ref={nameRef} id="name" defaultValue={editingProduct?.name} placeholder="Nhập tên sản phẩm" className="col-span-3" />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="category" className="text-right">
-                Danh mục
-              </Label>
-              <select
-                id="category"
-                defaultValue={editingProduct?.category}
-                className="col-span-3 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
-              >
+              <Label htmlFor="category" className="text-right">Danh mục</Label>
+              <select ref={categoryRef} id="category" defaultValue={editingProduct?.parent_id || ''} className="col-span-3 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500">
                 <option value="">-- Chọn danh mục --</option>
-                {categories.map(cat => (
-                  <option key={cat.id} value={cat.name}>{cat.name}</option>
+                {productCategories.map(cat => (
+                  <option key={cat.id} value={cat.id}>{cat.name}</option>
                 ))}
               </select>
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="originalPrice" className="text-right">
-                Giá gốc
-              </Label>
-              <Input
-                id="originalPrice"
-                type="number"
-                defaultValue={editingProduct?.originalPrice}
-                placeholder="VD: 250000"
-                className="col-span-3"
-              />
+              <Label htmlFor="originalPrice" className="text-right">Giá gốc <span className="text-red-500">*</span></Label>
+              <Input ref={priceRef} id="originalPrice" type="number" defaultValue={editingProduct?.price} placeholder="VD: 250000" className="col-span-3" />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="salePrice" className="text-right">
-                Giá khuyến mãi
-              </Label>
-              <Input
-                id="salePrice"
-                type="number"
-                defaultValue={editingProduct?.salePrice}
-                placeholder="VD: 200000"
-                className="col-span-3"
-              />
+              <Label htmlFor="salePrice" className="text-right">Giá khuyến mãi</Label>
+              <Input ref={salePriceRef} id="salePrice" type="number" defaultValue={editingProduct?.sale_price || ''} placeholder="VD: 200000" className="col-span-3" />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="image" className="text-right">
-                Hình ảnh
-              </Label>
+              <Label htmlFor="image" className="text-right">Hình ảnh</Label>
               <div className="col-span-3">
-                <Input
-                  id="image"
-                  type="file"
-                  accept="image/*"
-                  className="cursor-pointer"
-                />
+                <Input ref={imageRef} id="image" type="file" accept="image/*" className="cursor-pointer" />
                 <p className="text-xs text-gray-500 mt-1">Chấp nhận: JPG, PNG, GIF (tối đa 2MB)</p>
               </div>
             </div>
+            <div className="grid grid-cols-4 items-start gap-4">
+              <Label htmlFor="description" className="text-right pt-2">Mô tả</Label>
+              <textarea ref={descriptionRef} id="description" defaultValue={editingProduct?.description || ''} placeholder="Nhập mô tả sản phẩm" rows={3} className="col-span-3 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500" />
+            </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsProductDialogOpen(false)}>
-              Hủy
-            </Button>
-            <Button 
-              onClick={() => setIsProductDialogOpen(false)}
-              className="bg-pink-500 hover:bg-pink-600"
-            >
-              {editingProduct ? 'Cập nhật' : 'Thêm mới'}
+            <Button variant="outline" onClick={() => setIsProductDialogOpen(false)} disabled={isSubmitting}>Hủy</Button>
+            <Button onClick={handleSubmitProduct} disabled={isSubmitting} className="bg-pink-500 hover:bg-pink-600">
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Đang xử lý...
+                </>
+              ) : (
+                editingProduct ? 'Cập nhật' : 'Thêm mới'
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>

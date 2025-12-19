@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import AdminLayout from '@/components/AdminLayout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -20,35 +20,27 @@ import {
   Bell,
   Eye,
   EyeOff,
-  CheckCircle
+  CheckCircle,
+  Loader2
 } from 'lucide-react';
+import { useAdminAuth } from '@/lib/AdminAuthContext';
+import { getImageUrl } from '@/lib/api';
 
 interface AdminProfile {
-  id: string;
+  id: number;
   fullName: string;
   email: string;
   phone: string;
   address: string;
-  avatar: string;
+  avatar: string | null;
   role: string;
   joinDate: string;
   lastLogin: string;
 }
 
-const mockProfile: AdminProfile = {
-  id: 'ADMIN001',
-  fullName: 'Nguyễn Văn Admin',
-  email: 'admin@styla.com',
-  phone: '0901234567',
-  address: 'Quận 1, TP. Hồ Chí Minh',
-  avatar: '/images/admin-avatar.jpg',
-  role: 'Super Admin',
-  joinDate: '2024-01-15',
-  lastLogin: '2025-12-03 08:30:00',
-};
-
 export default function AdminProfilePage() {
-  const [profile, setProfile] = useState<AdminProfile>(mockProfile);
+  const { admin, loading: authLoading } = useAdminAuth();
+  const [profile, setProfile] = useState<AdminProfile | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
@@ -56,15 +48,32 @@ export default function AdminProfilePage() {
   const [activeTab, setActiveTab] = useState<'profile' | 'password' | 'notifications'>('profile');
   const [saveSuccess, setSaveSuccess] = useState(false);
 
+  // Chuyển đổi admin data thành profile format
+  useEffect(() => {
+    if (admin) {
+      setProfile({
+        id: admin.id,
+        fullName: admin.name,
+        email: admin.email,
+        phone: '',  // API chưa có field này
+        address: '', // API chưa có field này
+        avatar: admin.image,
+        role: admin.role || 'Admin',
+        joinDate: new Date().toISOString(),
+        lastLogin: new Date().toISOString(),
+      });
+    }
+  }, [admin]);
+
   const handleSaveProfile = () => {
-    // Giả lập lưu profile
+    // TODO: Implement API call to update profile
     setSaveSuccess(true);
     setIsEditing(false);
     setTimeout(() => setSaveSuccess(false), 3000);
   };
 
   const handleChangePassword = () => {
-    // Giả lập đổi mật khẩu
+    // TODO: Implement API call to change password
     setSaveSuccess(true);
     setTimeout(() => setSaveSuccess(false), 3000);
   };
@@ -76,6 +85,17 @@ export default function AdminProfilePage() {
       year: 'numeric'
     });
   };
+
+  if (authLoading || !profile) {
+    return (
+      <AdminLayout>
+        <div className="flex items-center justify-center h-64">
+          <Loader2 className="w-8 h-8 animate-spin text-pink-500" />
+          <span className="ml-2">Đang tải thông tin...</span>
+        </div>
+      </AdminLayout>
+    );
+  }
 
   return (
     <AdminLayout>
@@ -101,7 +121,7 @@ export default function AdminProfilePage() {
                 <div className="text-center">
                   <div className="relative inline-block">
                     <Avatar className="w-32 h-32 mx-auto border-4 border-pink-100">
-                      <AvatarImage src={profile.avatar} />
+                      <AvatarImage src={profile.avatar ? getImageUrl(profile.avatar, 'user') : undefined} />
                       <AvatarFallback className="text-3xl bg-gradient-to-br from-pink-400 to-purple-500 text-white">
                         {profile.fullName.split(' ').map(n => n[0]).join('').slice(0, 2)}
                       </AvatarFallback>

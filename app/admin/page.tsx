@@ -4,58 +4,104 @@ import React, { useState } from 'react';
 import AdminLayout from '@/components/AdminLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Loader2 } from 'lucide-react';
+import { useAdminProducts, useOrders, useCustomers } from '@/lib/hooks';
 
 export default function AdminDashboard() {
   const [timeFilter, setTimeFilter] = useState<'today' | '7days' | '30days'>('7days');
+  
+  const { products, loading: productsLoading } = useAdminProducts();
+  const { orders, loading: ordersLoading } = useOrders();
+  const { customers, loading: customersLoading } = useCustomers();
 
-  // Mock data
-  const stats = {
-    revenue: {
-      today: '25,430,000₫',
-      '7days': '178,500,000₫',
-      '30days': '756,200,000₫',
-    },
-    orders: {
-      today: 12,
-      '7days': 89,
-      '30days': 342,
-    },
-    newUsers: {
-      today: 5,
-      '7days': 34,
-      '30days': 128,
-    },
-    products: 156,
+  const loading = productsLoading || ordersLoading || customersLoading;
+
+  // Calculate real stats from API data
+  const formatPrice = (price: number) => {
+    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
   };
 
-  const recentOrders = [
-    { id: 'DH001', customer: 'Nguyễn Văn A', total: '1,250,000₫', status: 'Chờ xác nhận' },
-    { id: 'DH002', customer: 'Trần Thị B', total: '850,000₫', status: 'Đang giao' },
-    { id: 'DH003', customer: 'Lê Văn C', total: '2,150,000₫', status: 'Hoàn thành' },
-    { id: 'DH004', customer: 'Phạm Thị D', total: '650,000₫', status: 'Chờ xác nhận' },
-    { id: 'DH005', customer: 'Hoàng Văn E', total: '1,800,000₫', status: 'Đang giao' },
-  ];
+  const totalRevenue = orders.reduce((sum, order) => sum + order.total_money, 0);
+  const totalOrders = orders.length;
+  const totalCustomers = customers.length;
+  const totalProducts = products.length;
 
-  const topProducts = [
-    { name: 'Áo thun basic', sold: 245, revenue: '24,500,000₫' },
-    { name: 'Quần jean slim fit', sold: 189, revenue: '37,800,000₫' },
-    { name: 'Giày sneaker', sold: 156, revenue: '46,800,000₫' },
-    { name: 'Túi xách nữ', sold: 134, revenue: '26,800,000₫' },
-    { name: 'Mũ lưỡi trai', sold: 98, revenue: '9,800,000₫' },
-  ];
+  // Filter orders by date
+  const now = new Date();
+  const filterOrdersByDate = (days: number) => {
+    const cutoff = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
+    return orders.filter(order => new Date(order.created_at) >= cutoff);
+  };
 
-  const getStatusColor = (status: string) => {
+  const getFilteredStats = () => {
+    let filteredOrders = orders;
+    switch (timeFilter) {
+      case 'today':
+        filteredOrders = filterOrdersByDate(1);
+        break;
+      case '7days':
+        filteredOrders = filterOrdersByDate(7);
+        break;
+      case '30days':
+        filteredOrders = filterOrdersByDate(30);
+        break;
+    }
+    return {
+      revenue: filteredOrders.reduce((sum, o) => sum + o.total_money, 0),
+      orderCount: filteredOrders.length,
+    };
+  };
+
+  const filteredStats = getFilteredStats();
+
+  // Get recent orders
+  const recentOrders = orders
+    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+    .slice(0, 5);
+
+  // Get top products by sold count
+  const topProducts = products
+    .sort((a, b) => b.sold - a.sold)
+    .slice(0, 5);
+
+  const getStatusLabel = (status: number) => {
+    const labels: Record<number, string> = {
+      0: 'Chờ xác nhận',
+      1: 'Đã xác nhận',
+      2: 'Đang giao',
+      3: 'Hoàn thành',
+      4: 'Đã hủy',
+    };
+    return labels[status] || 'Không rõ';
+  };
+
+  const getStatusColor = (status: number) => {
     switch (status) {
-      case 'Chờ xác nhận':
+      case 0:
         return 'bg-yellow-100 text-yellow-800';
-      case 'Đang giao':
+      case 1:
         return 'bg-blue-100 text-blue-800';
-      case 'Hoàn thành':
+      case 2:
+        return 'bg-purple-100 text-purple-800';
+      case 3:
         return 'bg-green-100 text-green-800';
+      case 4:
+        return 'bg-red-100 text-red-800';
       default:
         return 'bg-gray-100 text-gray-800';
     }
   };
+
+  if (loading) {
+    return (
+      <AdminLayout>
+        <div className="flex items-center justify-center h-64">
+          <Loader2 className="w-8 h-8 animate-spin text-pink-500" />
+          <span className="ml-2">Đang tải dữ liệu...</span>
+        </div>
+      </AdminLayout>
+    );
+  }
 
   return (
     <AdminLayout>
@@ -92,44 +138,45 @@ export default function AdminDashboard() {
           <Card>
             <CardHeader className="pb-2">
               <CardDescription>Doanh thu</CardDescription>
-              <CardTitle className="text-3xl">{stats.revenue[timeFilter]}</CardTitle>
+              <CardTitle className="text-3xl">{formatPrice(filteredStats.revenue)}</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-xs text-green-600">↑ 12.5% so với kỳ trước</p>
+              <p className="text-xs text-gray-500">Tổng: {formatPrice(totalRevenue)}</p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="pb-2">
               <CardDescription>Đơn hàng</CardDescription>
-              <CardTitle className="text-3xl">{stats.orders[timeFilter]}</CardTitle>
+              <CardTitle className="text-3xl">{filteredStats.orderCount}</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-xs text-green-600">↑ 8.2% so với kỳ trước</p>
+              <p className="text-xs text-gray-500">Tổng: {totalOrders} đơn</p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="pb-2">
-              <CardDescription>Người dùng mới</CardDescription>
-              <CardTitle className="text-3xl">{stats.newUsers[timeFilter]}</CardTitle>
+              <CardDescription>Khách hàng</CardDescription>
+              <CardTitle className="text-3xl">{totalCustomers}</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-xs text-green-600">↑ 15.3% so với kỳ trước</p>
+              <p className="text-xs text-green-600">Tổng số khách hàng đã đăng ký</p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="pb-2">
-              <CardDescription>Tổng sản phẩm</CardDescription>
-              <CardTitle className="text-3xl">{stats.products}</CardTitle>
+              <CardDescription>Sản phẩm</CardDescription>
+              <CardTitle className="text-3xl">{totalProducts}</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-xs text-gray-500">Đang hoạt động</p>
+              <p className="text-xs text-gray-500">Tổng số sản phẩm trong kho</p>
             </CardContent>
           </Card>
         </div>
 
+        {/* Recent Orders & Top Products */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Recent Orders */}
           <Card>
@@ -138,32 +185,26 @@ export default function AdminDashboard() {
               <CardDescription>5 đơn hàng mới nhất</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {recentOrders.map((order) => (
-                  <div
-                    key={order.id}
-                    className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
-                  >
-                    <div>
-                      <p className="font-medium">{order.id}</p>
-                      <p className="text-sm text-gray-500">{order.customer}</p>
+              {recentOrders.length === 0 ? (
+                <p className="text-gray-500 text-center py-4">Chưa có đơn hàng nào</p>
+              ) : (
+                <div className="space-y-4">
+                  {recentOrders.map((order) => (
+                    <div key={order.id} className="flex items-center justify-between border-b pb-3 last:border-0">
+                      <div>
+                        <p className="font-medium">{order.order_code}</p>
+                        <p className="text-sm text-gray-500">{order.customer_name}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-medium">{formatPrice(order.total_money)}</p>
+                        <span className={`text-xs px-2 py-1 rounded-full ${getStatusColor(order.order_status)}`}>
+                          {getStatusLabel(order.order_status)}
+                        </span>
+                      </div>
                     </div>
-                    <div className="text-right">
-                      <p className="font-medium">{order.total}</p>
-                      <span
-                        className={`text-xs px-2 py-1 rounded-full ${getStatusColor(
-                          order.status
-                        )}`}
-                      >
-                        {order.status}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <Button variant="outline" className="w-full mt-4">
-                Xem tất cả đơn hàng
-              </Button>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
 
@@ -171,33 +212,59 @@ export default function AdminDashboard() {
           <Card>
             <CardHeader>
               <CardTitle>Sản phẩm bán chạy</CardTitle>
-              <CardDescription>Top 5 sản phẩm trong {timeFilter === 'today' ? 'hôm nay' : timeFilter === '7days' ? '7 ngày' : '30 ngày'}</CardDescription>
+              <CardDescription>Top 5 sản phẩm theo số lượng bán</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {topProducts.map((product, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
-                  >
-                    <div className="flex items-center space-x-3">
-                      <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold">
-                        {index + 1}
+              {topProducts.length === 0 ? (
+                <p className="text-gray-500 text-center py-4">Chưa có sản phẩm nào</p>
+              ) : (
+                <div className="space-y-4">
+                  {topProducts.map((product, index) => (
+                    <div key={product.id} className="flex items-center justify-between border-b pb-3 last:border-0">
+                      <div className="flex items-center gap-3">
+                        <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+                          index === 0 ? 'bg-yellow-100 text-yellow-700' :
+                          index === 1 ? 'bg-gray-100 text-gray-700' :
+                          index === 2 ? 'bg-orange-100 text-orange-700' :
+                          'bg-gray-50 text-gray-500'
+                        }`}>
+                          {index + 1}
+                        </span>
+                        <div>
+                          <p className="font-medium">{product.name}</p>
+                          <p className="text-sm text-gray-500">Đã bán: {product.sold}</p>
+                        </div>
                       </div>
-                      <div>
-                        <p className="font-medium">{product.name}</p>
-                        <p className="text-sm text-gray-500">Đã bán: {product.sold}</p>
+                      <div className="text-right">
+                        <p className="font-medium text-pink-600">{formatPrice(product.sale_price || product.price)}</p>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <p className="font-medium">{product.revenue}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
+
+        {/* Order Status Overview */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Tổng quan trạng thái đơn hàng</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+              {[0, 1, 2, 3, 4].map((status) => {
+                const count = orders.filter(o => o.order_status === status).length;
+                return (
+                  <div key={status} className={`p-4 rounded-lg ${getStatusColor(status)}`}>
+                    <p className="text-2xl font-bold">{count}</p>
+                    <p className="text-sm">{getStatusLabel(status)}</p>
+                  </div>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </AdminLayout>
   );

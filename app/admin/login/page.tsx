@@ -17,12 +17,6 @@ export default function AdminLoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
 
-  // Demo admin accounts
-  const adminAccounts = [
-    { email: 'admin@styla.com', password: 'admin123', name: 'Super Admin', role: 'super_admin' },
-    { email: 'manager@styla.com', password: 'manager123', name: 'Quản lý', role: 'manager' },
-  ];
-
   const validateForm = () => {
     const newErrors: { email?: string; password?: string } = {};
     
@@ -61,40 +55,52 @@ export default function AdminLoginPage() {
     
     setIsLoading(true);
 
-    // Simulate API call
-    setTimeout(() => {
-      const admin = adminAccounts.find(
-        acc => acc.email === formData.email && acc.password === formData.password
-      );
-      
-      if (admin) {
+    try {
+      const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+      const response = await fetch(`${API_BASE_URL}/admin/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.status) {
         // Save admin session
         localStorage.setItem('adminUser', JSON.stringify({
-          email: admin.email,
-          name: admin.name,
-          role: admin.role,
+          id: data.data.user.id,
+          email: data.data.user.email,
+          name: data.data.user.name,
+          role: data.data.user.role,
+          image: data.data.user.image,
           loginTime: new Date().toISOString()
         }));
-        localStorage.setItem('adminToken', 'admin_token_' + Date.now());
+        localStorage.setItem('adminToken', data.data.token);
         
         toast.success('Đăng nhập thành công!', {
-          description: `Chào mừng ${admin.name} đến với hệ thống quản trị`,
+          description: `Chào mừng ${data.data.user.name} đến với hệ thống quản trị`,
         });
         
         router.push('/admin');
       } else {
         toast.error('Đăng nhập thất bại', {
-          description: 'Email hoặc mật khẩu không đúng',
+          description: data.message || 'Email hoặc mật khẩu không đúng',
         });
       }
-      
+    } catch (error) {
+      console.error('Login error:', error);
+      toast.error('Có lỗi xảy ra', {
+        description: 'Không thể kết nối đến server',
+      });
+    } finally {
       setIsLoading(false);
-    }, 1000);
-  };
-
-  const fillDemoAccount = (email: string, password: string) => {
-    setFormData({ ...formData, email, password });
-    setErrors({});
+    }
   };
 
   return (
@@ -221,38 +227,6 @@ export default function AdminLoginPage() {
               )}
             </button>
           </form>
-
-          {/* Demo Accounts */}
-          <div className="mt-8 p-4 bg-gradient-to-br from-pink-50 to-purple-50 rounded-xl border border-pink-100">
-            <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
-              <span className="text-lg">🔑</span>
-              Tài khoản demo
-            </h3>
-            <div className="space-y-2">
-              {adminAccounts.map((account, index) => (
-                <button
-                  key={index}
-                  type="button"
-                  onClick={() => fillDemoAccount(account.email, account.password)}
-                  className="w-full text-left p-3 bg-white rounded-lg border border-gray-100 hover:border-pink-200 hover:shadow-sm transition-all duration-200 group"
-                >
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-gray-800">{account.name}</p>
-                      <p className="text-xs text-gray-500">{account.email}</p>
-                    </div>
-                    <span className={`text-xs px-2 py-1 rounded-full ${
-                      account.role === 'super_admin' 
-                        ? 'bg-purple-100 text-purple-700' 
-                        : 'bg-blue-100 text-blue-700'
-                    }`}>
-                      {account.role === 'super_admin' ? 'Super Admin' : 'Manager'}
-                    </span>
-                  </div>
-                </button>
-              ))}
-            </div>
-          </div>
 
           {/* Back to Website */}
           <div className="mt-6 text-center">

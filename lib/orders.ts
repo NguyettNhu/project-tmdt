@@ -32,204 +32,39 @@ export interface Order {
   estimatedDelivery?: string;
 }
 
-// Mock orders data
-export const mockOrders: Order[] = [
-  {
-    id: 1001,
-    userId: 1,
-    orderDate: '2024-11-10T10:30:00',
-    status: 'delivered',
-    items: [
-      {
-        productId: 1,
-        productName: 'Áo Thun Basic Trắng',
-        productImage: '/images/product-01.jpg',
-        quantity: 2,
-        price: 29.99,
-        size: 'M',
-        color: 'Trắng'
-      },
-      {
-        productId: 5,
-        productName: 'Quần Jean Xanh',
-        productImage: '/images/product-05.jpg',
-        quantity: 1,
-        price: 59.99,
-        size: 'L'
-      }
-    ],
-    totalAmount: 119.97,
-    shippingAddress: {
-      fullName: 'Nguyễn Văn A',
-      phone: '0901234567',
-      address: '123 Nguyễn Huệ',
-      ward: 'Phường Bến Nghé',
-      district: 'Quận 1',
-      city: 'TP. Hồ Chí Minh'
-    },
-    paymentMethod: 'cod',
-    shippingFee: 30000,
-    trackingNumber: 'VN123456789',
-    estimatedDelivery: '2024-11-15'
-  },
-  {
-    id: 1002,
-    userId: 1,
-    orderDate: '2024-11-14T15:20:00',
-    status: 'shipping',
-    items: [
-      {
-        productId: 3,
-        productName: 'Áo Hoodie Đen',
-        productImage: '/images/product-03.jpg',
-        quantity: 1,
-        price: 49.99,
-        size: 'L',
-        color: 'Đen'
-      }
-    ],
-    totalAmount: 49.99,
-    shippingAddress: {
-      fullName: 'Nguyễn Văn A',
-      phone: '0901234567',
-      address: '123 Nguyễn Huệ',
-      ward: 'Phường Bến Nghé',
-      district: 'Quận 1',
-      city: 'TP. Hồ Chí Minh'
-    },
-    paymentMethod: 'bank_transfer',
-    shippingFee: 30000,
-    trackingNumber: 'VN987654321',
-    estimatedDelivery: '2024-11-18',
-    note: 'Giao hàng buổi sáng'
-  },
-  {
-    id: 1003,
-    userId: 1,
-    orderDate: '2024-11-15T09:45:00',
-    status: 'confirmed',
-    items: [
-      {
-        productId: 8,
-        productName: 'Giày Sneaker Trắng',
-        productImage: '/images/product-08.jpg',
-        quantity: 1,
-        price: 89.99,
-        size: '42'
-      },
-      {
-        productId: 10,
-        productName: 'Túi Xách Da',
-        productImage: '/images/product-10.jpg',
-        quantity: 1,
-        price: 129.99,
-        color: 'Nâu'
-      }
-    ],
-    totalAmount: 219.98,
-    shippingAddress: {
-      fullName: 'Nguyễn Văn A',
-      phone: '0901234567',
-      address: '123 Nguyễn Huệ',
-      ward: 'Phường Bến Nghé',
-      district: 'Quận 1',
-      city: 'TP. Hồ Chí Minh'
-    },
-    paymentMethod: 'credit_card',
-    shippingFee: 30000,
-    estimatedDelivery: '2024-11-20'
-  },
-  {
-    id: 1004,
-    userId: 2,
-    orderDate: '2024-11-12T14:00:00',
-    status: 'delivered',
-    items: [
-      {
-        productId: 2,
-        productName: 'Áo Thun Đen Basic',
-        productImage: '/images/product-02.jpg',
-        quantity: 3,
-        price: 29.99,
-        size: 'S',
-        color: 'Đen'
-      }
-    ],
-    totalAmount: 89.97,
-    shippingAddress: {
-      fullName: 'Trần Thị B',
-      phone: '0912345678',
-      address: '456 Lê Lợi',
-      ward: 'Phường Bến Thành',
-      district: 'Quận 1',
-      city: 'TP. Hồ Chí Minh'
-    },
-    paymentMethod: 'cod',
-    shippingFee: 30000,
-    trackingNumber: 'VN555666777',
-    estimatedDelivery: '2024-11-16'
-  },
-  {
-    id: 1005,
-    userId: 1,
-    orderDate: '2024-11-16T11:15:00',
-    status: 'pending',
-    items: [
-      {
-        productId: 11,
-        productName: 'Gấu Bông Teddy',
-        productImage: '/images/product-11.jpg',
-        quantity: 2,
-        price: 39.99
-      }
-    ],
-    totalAmount: 79.98,
-    shippingAddress: {
-      fullName: 'Nguyễn Văn A',
-      phone: '0901234567',
-      address: '123 Nguyễn Huệ',
-      ward: 'Phường Bến Nghé',
-      district: 'Quận 1',
-      city: 'TP. Hồ Chí Minh'
-    },
-    paymentMethod: 'cod',
-    shippingFee: 30000
-  }
-];
+// Mock orders data - DEPRECATED: Use API instead (lib/useOrders.ts)
+// Keeping empty array for backward compatibility
+export const mockOrders: Order[] = [];
 
-// Get orders by user ID
+// DEPRECATED: Use useOrders() hook from lib/useOrders.ts
 export function getOrdersByUserId(userId: number): Order[] {
-  return mockOrders
-    .filter(order => order.userId === userId)
-    .sort((a, b) => new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime());
+  console.warn('getOrdersByUserId is deprecated. Use useOrders() hook from lib/useOrders.ts');
+  return [];
 }
 
-// Get order by ID
+// DEPRECATED: Use useOrder() hook from lib/useOrders.ts
 export function getOrderById(orderId: number): Order | undefined {
-  return mockOrders.find(order => order.id === orderId);
+  console.warn('getOrderById is deprecated. Use useOrder() hook from lib/useOrders.ts');
+  return undefined;
 }
 
-// Get orders by status
+// DEPRECATED: Use API filters
 export function getOrdersByStatus(userId: number, status: OrderStatus): Order[] {
-  return mockOrders
-    .filter(order => order.userId === userId && order.status === status)
-    .sort((a, b) => new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime());
+  console.warn('getOrdersByStatus is deprecated. Use useOrders() with API filters');
+  return [];
 }
 
-// Get order statistics
+// DEPRECATED: Calculate from API data
 export function getOrderStats(userId: number) {
-  const userOrders = getOrdersByUserId(userId);
-  
+  console.warn('getOrderStats is deprecated. Calculate from useOrders() data');
   return {
-    total: userOrders.length,
-    pending: userOrders.filter(o => o.status === 'pending').length,
-    confirmed: userOrders.filter(o => o.status === 'confirmed').length,
-    shipping: userOrders.filter(o => o.status === 'shipping').length,
-    delivered: userOrders.filter(o => o.status === 'delivered').length,
-    cancelled: userOrders.filter(o => o.status === 'cancelled').length,
-    totalSpent: userOrders
-      .filter(o => o.status === 'delivered')
-      .reduce((sum, order) => sum + order.totalAmount, 0)
+    total: 0,
+    pending: 0,
+    confirmed: 0,
+    shipping: 0,
+    delivered: 0,
+    cancelled: 0,
+    totalSpent: 0
   };
 }
 

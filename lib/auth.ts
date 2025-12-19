@@ -4,7 +4,7 @@ export interface User {
   id: number;
   username: string;
   email: string;
-  password: string;
+  password?: string;
   role: UserRole;
   fullName: string;
   avatar?: string;
@@ -16,76 +16,14 @@ export interface User {
   joinDate?: string;
 }
 
-// Mock users data
-export const mockUsers: User[] = [
-  {
-    id: 1,
-    username: 'buyer1',
-    email: 'buyer@example.com',
-    password: '123456',
-    role: 'buyer',
-    fullName: 'Nguyễn Văn A',
-    avatar: 'https://i.pravatar.cc/150?img=1',
-    phone: '0901234567',
-    address: '123 Nguyễn Huệ',
-    ward: 'Phường Bến Nghé',
-    district: 'Quận 1',
-    city: 'TP. Hồ Chí Minh',
-    joinDate: '2024-01-15'
-  },
-  {
-    id: 2,
-    username: 'buyer2',
-    email: 'khachhang@example.com',
-    password: '123456',
-    role: 'buyer',
-    fullName: 'Trần Thị B',
-    avatar: 'https://i.pravatar.cc/150?img=5',
-    phone: '0912345678',
-    address: '456 Lê Lợi',
-    ward: 'Phường Bến Thành',
-    district: 'Quận 1',
-    city: 'TP. Hồ Chí Minh',
-    joinDate: '2024-02-20'
-  },
-  {
-    id: 3,
-    username: 'seller1',
-    email: 'seller@example.com',
-    password: '123456',
-    role: 'seller',
-    fullName: 'Shop Thời Trang ABC',
-    avatar: 'https://i.pravatar.cc/150?img=12',
-    phone: '0923456789',
-    address: '789 Trần Hưng Đạo',
-    ward: 'Phường Cầu Kho',
-    district: 'Quận 1',
-    city: 'TP. Hồ Chí Minh',
-    joinDate: '2023-12-01'
-  },
-  {
-    id: 4,
-    username: 'seller2',
-    email: 'cuahang@example.com',
-    password: '123456',
-    role: 'seller',
-    fullName: 'Cửa Hàng XYZ',
-    avatar: 'https://i.pravatar.cc/150?img=8',
-    phone: '0934567890',
-    address: '321 Võ Văn Tần',
-    ward: 'Phường 5',
-    district: 'Quận 3',
-    city: 'TP. Hồ Chí Minh',
-    joinDate: '2023-11-10'
-  }
-];
+// Mock users data - DEPRECATED: Use API instead (lib/AuthContext.tsx)
+// Keeping empty array for backward compatibility
+export const mockUsers: User[] = [];
 
-// Login function
+// Login function - DEPRECATED: Use useAuth() hook from lib/AuthContext.tsx
 export function loginUser(email: string, password: string): User | null {
-  const user = mockUsers.find(
-    u => (u.email === email || u.username === email) && u.password === password
-  );
-  return user || null;
+  console.warn('loginUser is deprecated. Use useAuth() hook from lib/AuthContext.tsx');
+  return null;
 }
 
 // Get current user from localStorage
