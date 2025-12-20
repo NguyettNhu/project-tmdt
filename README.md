@@ -1,54 +1,150 @@
-# Project TMĐT
+# Project TMĐT (Thương Mại Điện Tử)
 
-This is a Next.js project for an e-commerce website.
+Dự án website thương mại điện tử Fullstack sử dụng Laravel (Backend) và Next.js (Frontend).
 
-## Getting Started
+## Cấu trúc dự án
 
-First, install the dependencies:
+- **backend/**: Mã nguồn Laravel API.
+- **frontend/**: Mã nguồn Next.js Client.
+- **docker-compose.yml**: Cấu hình Docker để chạy toàn bộ dự án.
+
+---
+
+## Yêu cầu hệ thống
+
+### Nếu chạy bằng Docker (Khuyên dùng)
+- Docker Desktop hoặc Docker Engine
+- Docker Compose
+
+### Nếu chạy thủ công (Không dùng Docker)
+- **PHP**: >= 8.2
+- **Composer**: Trình quản lý gói cho PHP
+- **Node.js**: >= 18 (Khuyên dùng bản LTS mới nhất)
+- **MySQL**: >= 8.0
+
+---
+
+## 1. Hướng dẫn chạy bằng Docker (Nhanh nhất)
+
+Cách này sẽ tự động cài đặt môi trường và chạy tất cả các dịch vụ (Frontend, Backend, Database, Nginx).
+
+### Bước 1: Clone dự án và khởi chạy
+Tại thư mục gốc của dự án, chạy lệnh:
 
 ```bash
-npm install
-# or
-yarn install
-# or
-pnpm install
+docker compose up -d --build
 ```
 
-Then, run the development server:
+Hệ thống sẽ tự động:
+- Cài đặt dependencies (Composer).
+- Tạo file `.env` và generate key.
+- Chờ database khởi động.
+- Chạy migrations và seed dữ liệu mẫu (nếu chạy lần đầu).
 
+Bạn có thể theo dõi quá trình cài đặt tự động bằng lệnh:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
+docker compose logs -f app
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Bước 2: Truy cập
+Sau khi container `app` báo "Starting PHP-FPM...", bạn có thể truy cập:
+- **Frontend**: [http://localhost:3000](http://localhost:3000)
+- **Backend API**: [http://localhost:8000](http://localhost:8000)
+- **Database**: Host: `localhost`, Port: `3306`, User: `laravel`, Pass: `secret`, DB: `e-laravel`
 
-## Available Scripts
+---
 
-In the project directory, you can run:
+## 2. Hướng dẫn chạy thủ công (Không dùng Docker)
 
-### `npm run dev`
+Nếu bạn muốn chạy từng phần riêng biệt trên máy local.
 
-Runs the app in the development mode.
+### Thiết lập Database
+Tạo một database MySQL trống (ví dụ tên là `project_tmdt`).
 
-### `npm run build`
+### Thiết lập Backend (Laravel)
 
-Builds the app for production to the `.next` folder.
+1. Di chuyển vào thư mục backend:
+   ```bash
+   cd backend
+   ```
 
-### `npm run start`
+2. Cài đặt dependencies:
+   ```bash
+   composer install
+   ```
 
-Starts the production server.
+3. Cấu hình môi trường:
+   - Copy file `.env.example` thành `.env`:
+     ```bash
+     cp .env.example .env
+     ```
+   - Mở file `.env` và cập nhật thông tin database của bạn:
+     ```env
+     DB_CONNECTION=mysql
+     DB_HOST=127.0.0.1
+     DB_PORT=3306
+     DB_DATABASE=project_tmdt  # Tên database bạn đã tạo
+     DB_USERNAME=root          # Username database của bạn
+     DB_PASSWORD=              # Password database của bạn
+     ```
 
-### `npm run lint`
+4. Tạo Application Key:
+   ```bash
+   php artisan key:generate
+   ```
 
-Runs the linter.
+5. Chạy Migrations:
+   ```bash
+   php artisan migrate
+   ```
 
-## Technologies Used
+6. Khởi chạy server:
+   ```bash
+   php artisan serve --port=8000
+   ```
+   Backend sẽ chạy tại: `http://localhost:8000`
 
-*   [Next.js](https://nextjs.org/)
-*   [React](https://reactjs.org/)
-*   [TypeScript](https://www.typescriptlang.org/)
-*   [Tailwind CSS](https://tailwindcss.com/)
+### Thiết lập Frontend (Next.js)
+
+1. Mở terminal mới và di chuyển vào thư mục frontend:
+   ```bash
+   cd frontend
+   ```
+
+2. Cài đặt dependencies:
+   ```bash
+   npm install
+   # hoặc yarn install
+   ```
+
+3. Cấu hình môi trường:
+   - Tạo file `.env.local` (nếu cần thiết) để cấu hình API URL. Mặc định code có thể đã trỏ về `http://localhost:8000`.
+   - Nếu cần, thêm vào `.env.local`:
+     ```env
+     NEXT_PUBLIC_API_URL=http://localhost:8000/api
+     ```
+
+4. Khởi chạy server:
+   ```bash
+   npm run dev
+   ```
+   Frontend sẽ chạy tại: `http://localhost:3000`
+
+---
+
+## Các lệnh thường dùng với Docker
+
+- **Dừng các container**:
+  ```bash
+  docker compose down
+  ```
+
+- **Xem logs**:
+  ```bash
+  docker compose logs -f
+  ```
+
+- **Truy cập vào shell của container backend**:
+  ```bash
+  docker compose exec app bash
+  ```
