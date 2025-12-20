@@ -22,3 +22,9 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# Ignore storage directories
+/storage/app/public/images
+/storage/app/public/products
+/storage/app/public/categories
+/storage/app/public/users
