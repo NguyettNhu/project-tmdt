@@ -19,6 +19,26 @@ if grep -q "^APP_KEY=$" .env || ! grep -q "APP_KEY=" .env; then
     php artisan key:generate
 fi
 
+# 4. Create storage directories and link
+if [ ! -d "storage/app/public" ]; then
+    echo "Creating storage/app/public directory..."
+    mkdir -p storage/app/public
+fi
+
+# Create common image directories
+for dir in images products categories users; do
+    if [ ! -d "storage/app/public/$dir" ]; then
+        echo "Creating storage/app/public/$dir directory..."
+        mkdir -p "storage/app/public/$dir"
+    fi
+done
+
+# Ensure storage link exists
+if [ ! -L "public/storage" ]; then
+    echo "Creating storage link..."
+    php artisan storage:link
+fi
+
 echo "Waiting for database connection..."
 # Wait for MySQL to be ready
 until php -r "
