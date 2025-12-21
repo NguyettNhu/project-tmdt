@@ -33,6 +33,9 @@ export default function SafeImage({
     }
   };
 
+  const isLocalhost = typeof imgSrc === 'string' && (imgSrc.startsWith('http://localhost') || imgSrc.startsWith('http://127.0.0.1'));
+  const shouldUnoptimize = props.unoptimized || isLocalhost;
+
   // If there's a fallback element and the image failed, show it
   if (error && fallbackElement) {
     return <>{fallbackElement}</>;
@@ -49,6 +52,7 @@ export default function SafeImage({
         src={fallbackSrc}
         alt={alt}
         className={className}
+        unoptimized={shouldUnoptimize}
       />
     );
   }
@@ -60,6 +64,7 @@ export default function SafeImage({
       alt={alt}
       className={className}
       onError={handleError}
+      unoptimized={shouldUnoptimize}
     />
   );
 }
