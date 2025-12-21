@@ -42,4 +42,10 @@ class Order extends Model
     {
         return $this->hasMany(OrderDetail::class, 'order_id');
     }
+
+    // Accessor for order_code
+    public function getOrderCodeAttribute()
+    {
+        return 'ORD-' . str_pad($this->id, 6, '0', STR_PAD_LEFT);
+    }
 }

@@ -28,13 +28,14 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { useOrders } from '@/hooks/useOrders';
+import { useAdminOrders, useUpdateOrderStatus } from '@/hooks/useAdminOrders';
 import { ApiOrder } from '@/lib/api';
-import { Loader2 } from 'lucide-react';
+import { Check, ChevronDown, Eye, Loader2, RefreshCw, Truck, XCircle } from 'lucide-react';
 import { useState } from 'react';
 
 export default function OrdersPage() {
-  const { orders: apiOrders, loading, error, refetch } = useOrders();
+  const { orders: apiOrders, loading, error, refetch } = useAdminOrders();
+  const { updateStatus, loading: updating } = useUpdateOrderStatus();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<number | 'all'>('all');
   const [selectedOrder, setSelectedOrder] = useState<ApiOrder | null>(null);
@@ -76,9 +77,14 @@ export default function OrdersPage() {
     return matchesSearch && matchesStatus;
   });
 
-  const handleStatusChange = (orderId: number, newStatus: number) => {
-    // TODO: Implement API call to update order status
-    console.log('Update order status:', orderId, newStatus);
+  const handleStatusChange = async (orderId: number, newStatus: number) => {
+    const result = await updateStatus(orderId, newStatus);
+    if (result.success) {
+      // Refresh orders list
+      await refetch();
+    } else {
+      alert(result.message || 'Cập nhật trạng thái thất bại');
+    }
   };
 
   const handleViewDetails = (order: ApiOrder) => {
@@ -177,10 +183,10 @@ export default function OrdersPage() {
                         <TableCell>{formatDate(order.created_at)}</TableCell>
                         <TableCell className="font-medium">{formatPrice(order.total_money)}</TableCell>
                         <TableCell>
-                          <Badge variant={paymentInfo.variant}>{paymentInfo.label}</Badge>
+                          <Badge variant={paymentInfo.variant} className="px-3 py-1">{paymentInfo.label}</Badge>
                         </TableCell>
                         <TableCell>
-                          <Badge variant={statusInfo.variant}>{statusInfo.label}</Badge>
+                          <Badge variant={statusInfo.variant} className="px-3 py-1">{statusInfo.label}</Badge>
                         </TableCell>
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-2">
@@ -188,30 +194,58 @@ export default function OrdersPage() {
                               size="sm"
                               variant="outline"
                               onClick={() => handleViewDetails(order)}
+                              className="btn-admin-action btn-admin-view"
                             >
+                              <Eye className="w-4 h-4 mr-1.5" />
                               Chi tiết
                             </Button>
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
-                                <Button size="sm" variant="outline">
-                                  Cập nhật ⌄
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="btn-admin-action btn-admin-edit"
+                                  disabled={updating}
+                                >
+                                  {updating ? (
+                                    <Loader2 className="w-4 h-4 mr-1.5 animate-spin" />
+                                  ) : (
+                                    <RefreshCw className="w-4 h-4 mr-1.5" />
+                                  )}
+                                  Cập nhật
+                                  <ChevronDown className="w-3 h-3 ml-1.5" />
                                 </Button>
                               </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end">
-                                <DropdownMenuLabel>Thay đổi trạng thái</DropdownMenuLabel>
+                              <DropdownMenuContent align="end" className="w-56">
+                                <DropdownMenuLabel className="text-gray-700">
+                                  <RefreshCw className="w-4 h-4 inline mr-2" />
+                                  Thay đổi trạng thái
+                                </DropdownMenuLabel>
                                 <DropdownMenuSeparator />
                                 {order.order_status === 0 && (
-                                  <DropdownMenuItem onClick={() => handleStatusChange(order.id, 1)}>
+                                  <DropdownMenuItem
+                                    onClick={() => handleStatusChange(order.id, 1)}
+                                    className="cursor-pointer hover:bg-green-50 hover:text-green-700"
+                                  >
+                                    <Check className="w-4 h-4 mr-2" />
                                     Xác nhận đơn hàng
                                   </DropdownMenuItem>
                                 )}
                                 {(order.order_status === 1 || order.order_status === 0) && (
-                                  <DropdownMenuItem onClick={() => handleStatusChange(order.id, 2)}>
+                                  <DropdownMenuItem
+                                    onClick={() => handleStatusChange(order.id, 2)}
+                                    className="cursor-pointer hover:bg-blue-50 hover:text-blue-700"
+                                  >
+                                    <Truck className="w-4 h-4 mr-2" />
                                     Chuyển sang Đang giao
                                   </DropdownMenuItem>
                                 )}
                                 {order.order_status === 2 && (
-                                  <DropdownMenuItem onClick={() => handleStatusChange(order.id, 3)}>
+                                  <DropdownMenuItem
+                                    onClick={() => handleStatusChange(order.id, 3)}
+                                    className="cursor-pointer hover:bg-green-50 hover:text-green-700"
+                                  >
+                                    <Check className="w-4 h-4 mr-2" />
                                     Hoàn thành đơn hàng
                                   </DropdownMenuItem>
                                 )}
@@ -219,8 +253,9 @@ export default function OrdersPage() {
                                 {order.order_status !== 3 && order.order_status !== 4 && (
                                   <DropdownMenuItem
                                     onClick={() => handleStatusChange(order.id, 4)}
-                                    className="text-red-600"
+                                    className="text-red-600 cursor-pointer hover:bg-red-50 focus:bg-red-50 focus:text-red-700"
                                   >
+                                    <XCircle className="w-4 h-4 mr-2" />
                                     Hủy đơn hàng
                                   </DropdownMenuItem>
                                 )}

@@ -45,4 +45,13 @@ class AdminAuthController extends Controller
             'message' => 'Đăng xuất thành công'
         ]);
     }
+
+    public function me(Request $request)
+    {
+        return response()->json([
+            'status' => true,
+            'message' => 'Lấy thông tin admin thành công',
+            'data' => $request->user()
+        ]);
+    }
 }

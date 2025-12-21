@@ -77,5 +77,37 @@ class OrderController extends Controller
             return $this->errorResponse('Lỗi khi tạo đơn hàng: ' . $e->getMessage(), 500);
         }
     }
+
+    // PUT /api/admin/orders/{id}/status (Admin only)
+    public function updateStatus(Request $request, $id)
+    {
+        $request->validate([
+            'order_status' => 'required|integer|min:0|max:4',
+        ]);
+
+        $order = Order::find($id);
+
+        if (!$order) {
+            return $this->errorResponse('Đơn hàng không tồn tại', 404);
+        }
+
+        // Map numeric status to string
+        $statusMap = [
+            0 => 'pending',
+            1 => 'confirmed',
+            2 => 'shipping',
+            3 => 'completed',
+            4 => 'cancelled',
+        ];
+
+        $order->order_status = $statusMap[$request->order_status];
+        $order->updated_by = $request->user()->id ?? null;
+        $order->save();
+
+        return $this->successResponse(
+            new OrderResource($order->load('customer', 'orderDetails.product')), 
+            'Cập nhật trạng thái đơn hàng thành công'
+        );
+    }
 }
 

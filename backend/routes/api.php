@@ -24,6 +24,7 @@ Route::prefix('admin')->group(function () {
 
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('/logout', [AdminAuthController::class, 'logout']);
+        Route::get('/me', [AdminAuthController::class, 'me']);
         
         // Fix for admin customers route
         Route::get('/customers', [CustomerController::class, 'index']);
@@ -34,6 +35,7 @@ Route::prefix('admin')->group(function () {
         Route::apiResource('/categories', CategoryController::class)->only(['index', 'show']);
         Route::apiResource('/posts', PostController::class)->only(['index', 'show']);
         Route::apiResource('/orders', \App\Http\Controllers\Api\OrderController::class)->only(['index', 'show']);
+        Route::put('/orders/{id}/status', [\App\Http\Controllers\Api\OrderController::class, 'updateStatus']);
     });
 });
 
