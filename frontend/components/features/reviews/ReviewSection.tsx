@@ -62,7 +62,10 @@ export default function ReviewSection({ productId }: ReviewSectionProps) {
 
         // Mock customer ID for now if not provided
         const reviewData = {
-            ...data,
+            rating: data.rating,
+            title: data.title,
+            comment: data.comment,
+            imageFiles: data.imageFiles,  // Pass file objects for upload
             product_id: productId,
             customer_id: 1, // Replace with actual user ID from auth context
         };

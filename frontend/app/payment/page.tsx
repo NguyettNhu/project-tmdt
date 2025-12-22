@@ -6,6 +6,7 @@ import Header from '@/components/layout/Header';
 import { useCart } from '@/context/CartContext';
 import Link from 'next/link';
 import { Check, Shirt } from 'lucide-react';
+import { formatCurrency } from '@/lib/orders';
 import { toast } from 'sonner';
 
 type PaymentMethod = 'credit-card' | 'paypal' | 'cod';
@@ -439,7 +440,7 @@ export default function PaymentPage() {
                       <div className="flex-1 min-w-0">
                         <p className="font-medium text-gray-900 text-sm truncate">{item.name}</p>
                         <p className="text-sm text-gray-600">x{item.qty}</p>
-                        <p className="font-semibold text-[#D9006C]">${(item.price * item.qty).toFixed(2)}</p>
+                        <p className="font-semibold text-[#D9006C]">{formatCurrency(Number(item.price) * Number(item.qty))}</p>
                       </div>
                     </div>
                   ))}
@@ -458,18 +459,18 @@ export default function PaymentPage() {
                 {/* Price Summary */}
                 <div className="border-t border-gray-200 pt-4 space-y-3">
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Tạm tính</span>
-                    <span className="font-semibold text-gray-900">${subtotal.toFixed(2)}</span>
+                    <span className="text-gray-600">Tạm tính </span>
+                    <span className="font-semibold text-gray-900">{formatCurrency(Number(subtotal))}</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-600">Phí vận chuyển</span>
                     <span className="font-semibold text-gray-900">
-                      {shippingInfo.shippingCost === 0 ? 'Miễn phí' : `${shippingInfo.shippingCost.toFixed(2)}đ`}
+                      {Number(shippingInfo.shippingCost) === 0 ? 'Miễn phí' : formatCurrency(Number(shippingInfo.shippingCost))}
                     </span>
                   </div>
                   <div className="flex justify-between text-lg font-bold pt-3 border-t border-gray-200">
                     <span className="text-gray-900">Tổng cộng</span>
-                    <span className="text-[#D9006C]">${total.toFixed(2)}</span>
+                    <span className="text-[#D9006C]">{formatCurrency(Number(total))}</span>
                   </div>
                 </div>
               </div>

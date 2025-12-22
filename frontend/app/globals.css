@@ -219,9 +219,12 @@ a:hover {
   font-size: 0.9375rem;
 }
 
-/* Button spacing improvements */
-button {
+/* Button base styles - only for buttons without explicit padding classes */
+button:not([class*="p-"]):not([class*="px-"]):not([class*="py-"]) {
   padding: 0.5rem 1rem;
+}
+
+button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -290,4 +293,135 @@ table th {
   background-color: #fdf2f8;
   color: #be185d;
   border-color: #fbcfe8;
+}
+
+/* Header Animations */
+@keyframes slideInFromTop {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-in {
+  animation-duration: 200ms;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  animation-fill-mode: both;
+}
+
+.fade-in {
+  animation-name: fadeIn;
+}
+
+.slide-in-from-top-2 {
+  animation-name: slideInFromTop;
+}
+
+/* Header glassmorphism effect */
+.header-glass {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+/* Smooth transitions for header */
+.header-transition {
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Cart badge pulse animation */
+@keyframes cartPulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+.cart-badge-pulse {
+  animation: cartPulse 2s ease-in-out infinite;
+}
+
+/* Navigation link underline effect */
+.nav-link-underline {
+  position: relative;
+}
+
+.nav-link-underline::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #D9006C, #FF1A7A);
+  border-radius: 1px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: translateX(-50%);
+}
+
+.nav-link-underline:hover::after,
+.nav-link-underline.active::after {
+  width: 100%;
+}
+
+/* Search input focus ring */
+.search-focus-ring:focus-within {
+  ring: 2px;
+  ring-color: rgba(217, 0, 108, 0.2);
+}
+
+/* Mobile menu item animation */
+@keyframes slideInFromLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.mobile-menu-item {
+  animation: slideInFromLeft 0.3s ease-out forwards;
+  opacity: 0;
+}
+
+/* Logo hover effect */
+.logo-hover {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.logo-hover:hover {
+  transform: scale(1.05);
+}
+
+.logo-hover:hover .logo-icon {
+  box-shadow: 0 10px 25px -5px rgba(217, 0, 108, 0.4);
 }

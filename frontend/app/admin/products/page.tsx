@@ -240,16 +240,27 @@ export default function ProductsPage() {
                         </button>
                       </TableCell>
                       <TableCell>
-                        <div className="flex items-center justify-center gap-1">
-                          <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-blue-600 hover:text-blue-700 hover:bg-blue-50" title="Xem chi tiết">
-                            <Eye className="w-4 h-4" />
-                          </Button>
-                          <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-amber-600 hover:text-amber-700 hover:bg-amber-50" onClick={() => handleOpenProductDialog(product)} title="Chỉnh sửa">
-                            <Edit className="w-4 h-4" />
-                          </Button>
-                          <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50" onClick={() => handleDeleteProduct(product.id)} title="Xóa">
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
+                        <div className="flex items-center justify-center gap-2">
+                          <button 
+                            className="p-2 rounded-lg text-blue-600 hover:text-blue-700 hover:bg-blue-50 transition-colors" 
+                            title="Xem chi tiết"
+                          >
+                            <Eye className="w-5 h-5" />
+                          </button>
+                          <button 
+                            className="p-2 rounded-lg text-amber-600 hover:text-amber-700 hover:bg-amber-50 transition-colors" 
+                            onClick={() => handleOpenProductDialog(product)} 
+                            title="Chỉnh sửa"
+                          >
+                            <Edit className="w-5 h-5" />
+                          </button>
+                          <button 
+                            className="p-2 rounded-lg text-red-600 hover:text-red-700 hover:bg-red-50 transition-colors" 
+                            onClick={() => handleDeleteProduct(product.id)} 
+                            title="Xóa"
+                          >
+                            <Trash2 className="w-5 h-5" />
+                          </button>
                         </div>
                       </TableCell>
                     </TableRow>

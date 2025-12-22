@@ -29,7 +29,6 @@ import {
     LayoutDashboard,
     Loader2,
     LogOut,
-    MessageSquare,
     Package,
     Settings,
     ShoppingCart,
@@ -69,11 +68,6 @@ const menuItems = [
         title: 'Quản lý Người dùng',
         href: '/admin/users',
         icon: Users,
-    },
-    {
-        title: 'Quản lý Tương tác',
-        href: '/admin/interactions',
-        icon: MessageSquare,
     },
     {
         title: 'Quản lý Nội dung',

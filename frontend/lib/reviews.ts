@@ -52,7 +52,7 @@ export function useReviews(productId: number) {
         rating: r.rating,
         title: r.title || '',
         comment: r.comment,
-        images: r.images?.map(img => getImageUrl(img, 'product')) || [],
+        images: r.images?.map(img => getImageUrl(img, 'review')) || [],
         verifiedPurchase: r.verifiedPurchase,
         helpful: r.helpful,
         createdAt: r.createdAt,
@@ -87,7 +87,7 @@ export function useSubmitReview() {
     rating: number;
     title?: string;
     comment: string;
-    images?: string[];
+    imageFiles?: File[];
   }) => {
     setLoading(true);
     setError(null);

@@ -12,20 +12,37 @@ export async function createReview(data: {
     rating: number;
     title?: string;
     comment: string;
-    images?: string[];
+    imageFiles?: File[];
 }): Promise<ApiReview> {
     const token = getAdminToken(); // Or customer token if you have one
     // Note: In a real app, you'd use the customer's token. 
     // For now, assuming the API might accept it or we need to implement customer auth token storage.
 
+    // Use FormData to upload files
+    const formData = new FormData();
+    formData.append('product_id', data.product_id.toString());
+    formData.append('customer_id', data.customer_id.toString());
+    formData.append('rating', data.rating.toString());
+    if (data.title) {
+        formData.append('title', data.title);
+    }
+    formData.append('comment', data.comment);
+    
+    // Append image files
+    if (data.imageFiles && data.imageFiles.length > 0) {
+        data.imageFiles.forEach((file) => {
+            formData.append('images[]', file);
+        });
+    }
+
     const response = await fetch(`${API_BASE_URL}/reviews`, {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json',
             'Accept': 'application/json',
+            // Don't set Content-Type for FormData - browser will set it automatically with boundary
             // 'Authorization': `Bearer ${token}`, // Add if auth required
         },
-        body: JSON.stringify(data),
+        body: formData,
     });
 
     const result = await response.json();

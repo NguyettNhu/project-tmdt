@@ -1,5 +1,5 @@
 // Get image URL with base path - handles multiple formats
-export function getImageUrl(path: string | null | undefined, type: 'product' | 'category' | 'post' | 'customer' | 'user' = 'product'): string {
+export function getImageUrl(path: string | null | undefined, type: 'product' | 'category' | 'post' | 'customer' | 'user' | 'review' = 'product'): string {
     // Default fallback - use existing product image
     const fallback = '/images/product-01.jpg';
 
@@ -32,6 +32,9 @@ export function getImageUrl(path: string | null | undefined, type: 'product' | '
         return `${baseUrl}/storage/${cleanPath}`;
     }
 
+    // Map type to folder name
+    const folderName = type === 'review' ? 'reviews' : type;
+
     // Otherwise, add the uploads/{type}/ prefix
-    return `${baseUrl}/storage/uploads/${type}/${path}`;
+    return `${baseUrl}/storage/uploads/${folderName}/${path}`;
 }

@@ -11,7 +11,7 @@ interface ReviewFormProps {
         rating: number;
         title: string;
         comment: string;
-        images: string[];
+        imageFiles: File[];
         size?: string;
         color?: string;
     }) => void;
@@ -24,33 +24,45 @@ export default function ReviewForm({ productId, onSubmit }: ReviewFormProps) {
     const [comment, setComment] = useState('');
     const [size, setSize] = useState('');
     const [color, setColor] = useState('');
-    const [images, setImages] = useState<string[]>([]);
+    const [images, setImages] = useState<string[]>([]);  // Preview URLs
+    const [imageFiles, setImageFiles] = useState<File[]>([]);  // Actual file objects
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showSuccess, setShowSuccess] = useState(false);
 
     const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = e.target.files;
         if (files) {
-            const newImages: string[] = [];
+            const newPreviews: string[] = [];
+            const newFiles: File[] = [];
+            
             for (let i = 0; i < files.length; i++) {
                 const file = files[i];
+                // Store the actual file
+                newFiles.push(file);
+                
+                // Create preview URL
                 const reader = new FileReader();
                 await new Promise<void>((resolve) => {
                     reader.onload = (e) => {
                         if (e.target?.result) {
-                            newImages.push(e.target.result as string);
+                            newPreviews.push(e.target.result as string);
                         }
                         resolve();
                     };
                     reader.readAsDataURL(file);
                 });
             }
-            setImages([...images, ...newImages].slice(0, 5)); // Max 5 images
+            
+            // Limit to max 5 images
+            const remainingSlots = 5 - images.length;
+            setImages([...images, ...newPreviews.slice(0, remainingSlots)]);
+            setImageFiles([...imageFiles, ...newFiles.slice(0, remainingSlots)]);
         }
     };
 
     const removeImage = (index: number) => {
         setImages(images.filter((_, i) => i !== index));
+        setImageFiles(imageFiles.filter((_, i) => i !== index));
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -75,7 +87,7 @@ export default function ReviewForm({ productId, onSubmit }: ReviewFormProps) {
             rating,
             title,
             comment,
-            images,
+            imageFiles,
             size: size || undefined,
             color: color || undefined,
         };
@@ -94,6 +106,7 @@ export default function ReviewForm({ productId, onSubmit }: ReviewFormProps) {
         setSize('');
         setColor('');
         setImages([]);
+        setImageFiles([]);
         setIsSubmitting(false);
 
         // Hide success message after 3 seconds

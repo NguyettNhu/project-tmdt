@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Check, Clock, Truck, PartyPopper, Shirt } from 'lucide-react';
+import { formatCurrency } from '@/lib/orders';
 
 type OrderData = {
   orderId: string;
@@ -180,8 +181,8 @@ export default function OrderConfirmationPage() {
                   <p className="text-sm text-gray-600">Số lượng: {item.qty}</p>
                 </div>
                 <div className="text-right">
-                  <p className="font-bold text-[#D9006C]">${(item.price * item.qty).toFixed(2)}</p>
-                  <p className="text-sm text-gray-500">${item.price.toFixed(2)} x {item.qty}</p>
+                  <p className="font-bold text-[#D9006C]">{formatCurrency(item.price * item.qty)}</p>
+                  <p className="text-sm text-gray-500">{formatCurrency(item.price)} x {item.qty}</p>
                 </div>
               </div>
             ))}
@@ -191,17 +192,17 @@ export default function OrderConfirmationPage() {
           <div className="mt-6 pt-6 border-t-2 border-gray-200 space-y-3">
             <div className="flex justify-between text-sm">
               <span className="text-gray-600">Tạm tính</span>
-              <span className="font-semibold text-gray-900">${orderData.subtotal.toFixed(2)}</span>
+              <span className="font-semibold text-gray-900">{formatCurrency(orderData.subtotal)}</span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-gray-600">Phí vận chuyển</span>
               <span className="font-semibold text-gray-900">
-                {orderData.shippingCost === 0 ? 'Miễn phí' : `${orderData.shippingCost.toFixed(2)}đ`}
+                {orderData.shippingCost === 0 ? 'Miễn phí' : formatCurrency(orderData.shippingCost)}
               </span>
             </div>
             <div className="flex justify-between text-xl font-bold pt-3 border-t border-gray-200">
               <span className="text-gray-900">Tổng cộng</span>
-              <span className="text-[#D9006C]">${orderData.total.toFixed(2)}</span>
+              <span className="text-[#D9006C]">{formatCurrency(orderData.total)}</span>
             </div>
           </div>
         </div>

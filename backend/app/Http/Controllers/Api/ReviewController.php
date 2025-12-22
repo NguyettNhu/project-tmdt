@@ -7,6 +7,7 @@ use App\Models\Review;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Storage;
 
 class ReviewController extends Controller
 {
@@ -52,8 +53,8 @@ class ReviewController extends Controller
             'rating' => 'required|integer|min:1|max:5',
             'title' => 'nullable|string|max:255',
             'comment' => 'required|string',
-            'images' => 'nullable|array',
-            'images.*' => 'string', // Base64 or URL
+            'images' => 'nullable|array|max:5',
+            'images.*' => 'image|mimes:jpeg,png,jpg,gif,webp|max:2048', // Validate as image files
         ]);
 
         if ($validator->fails()) {
@@ -68,13 +69,22 @@ class ReviewController extends Controller
         // In a real app, check Order/OrderDetail
         $verifiedPurchase = true; 
 
+        // Handle image uploads
+        $uploadedImages = [];
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $image) {
+                $filePath = $image->store('uploads/reviews', 'public');
+                $uploadedImages[] = basename($filePath);
+            }
+        }
+
         $review = Review::create([
             'product_id' => $request->product_id,
             'customer_id' => $request->customer_id,
             'rating' => $request->rating,
             'title' => $request->title,
             'comment' => $request->comment,
-            'images' => $request->images,
+            'images' => !empty($uploadedImages) ? $uploadedImages : null,
             'verified_purchase' => $verifiedPurchase,
             'helpful' => 0,
         ]);
