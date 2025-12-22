@@ -84,10 +84,7 @@ export function getStatusColor(status: OrderStatus): string {
 }
 
 export function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat('vi-VN', {
-    style: 'currency',
-    currency: 'VND'
-  }).format(amount);
+  return amount.toLocaleString('vi-VN') + ' đ';
 }
 // Format date
 export function formatDate(dateString: string): string {

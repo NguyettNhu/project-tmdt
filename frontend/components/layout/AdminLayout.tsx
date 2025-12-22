@@ -70,14 +70,9 @@ const menuItems = [
         icon: Users,
     },
     {
-        title: 'Quản lý Nội dung',
+        title: 'Quản lý tin tức',
         href: '/admin/content',
         icon: FileText,
-    },
-    {
-        title: 'Cấu hình Website',
-        href: '/admin/settings',
-        icon: Settings,
     },
 ];
 

@@ -147,7 +147,7 @@ class OrderController extends Controller
         $validatedData = $request->validate([
             'id' => "required|integer|exists:{$this->table},id",
             'total_price' => 'required|numeric|min:0',
-            'order_status' => 'required|string|in:pending,completed,cancelled',
+            'order_status' => 'required|string|in:pending,confirmed,shipping,completed,delivered,cancelled',
             'payment_status' => 'required|boolean',
             'note' => 'nullable|string'
         ]);

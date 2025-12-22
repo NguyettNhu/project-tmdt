@@ -1,4 +1,16 @@
+
 'use client';
+// Định dạng ngày cho hiển thị đơn hàng gần đây
+function formatDate(dateString: string): string {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('vi-VN', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}
 
 import AdminLayout from '@/components/layout/AdminLayout';
 import { Button } from '@/components/ui/button';
@@ -8,6 +20,7 @@ import { useOrders } from '@/hooks/useOrders';
 import { useAdminProducts } from '@/hooks/useProducts';
 import { Loader2 } from 'lucide-react';
 import { useState } from 'react';
+import { formatCurrency } from '@/lib/orders';
 
 export default function AdminDashboard() {
   const [timeFilter, setTimeFilter] = useState<'today' | '7days' | '30days'>('7days');
@@ -19,10 +32,6 @@ export default function AdminDashboard() {
   const loading = productsLoading || ordersLoading || customersLoading;
 
   // Calculate real stats from API data
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
-  };
-
   const totalRevenue = orders.reduce((sum, order) => sum + order.total_money, 0);
   const totalOrders = orders.length;
   const totalCustomers = customers.length;
@@ -140,10 +149,10 @@ export default function AdminDashboard() {
           <Card>
             <CardHeader className="pb-2">
               <CardDescription>Doanh thu</CardDescription>
-              <CardTitle className="text-3xl">{formatPrice(filteredStats.revenue)}</CardTitle>
+              <CardTitle className="text-3xl">{formatCurrency(filteredStats.revenue)}</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-xs text-gray-500">Tổng: {formatPrice(totalRevenue)}</p>
+              <p className="text-xs text-gray-500">Tổng: {formatCurrency(totalRevenue)}</p>
             </CardContent>
           </Card>
 
@@ -184,7 +193,7 @@ export default function AdminDashboard() {
           <Card>
             <CardHeader>
               <CardTitle>Đơn hàng gần đây</CardTitle>
-              <CardDescription>5 đơn hàng mới nhất</CardDescription>
+              <CardDescription>Đơn hàng mới nhất</CardDescription>
             </CardHeader>
             <CardContent>
               {recentOrders.length === 0 ? (
@@ -192,16 +201,23 @@ export default function AdminDashboard() {
               ) : (
                 <div className="space-y-4">
                   {recentOrders.map((order) => (
-                    <div key={order.id} className="flex items-center justify-between border-b pb-3 last:border-0">
-                      <div>
-                        <p className="font-medium">{order.order_code}</p>
-                        <p className="text-sm text-gray-500">{order.customer_name}</p>
+                    <div key={order.id} className="flex flex-col md:flex-row md:items-center justify-between border-b pb-3 last:border-0 gap-2">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex flex-wrap gap-2 items-center">
+                          <span className="font-semibold text-sm text-pink-600">{order.order_code}</span>
+                          <span className="text-xs text-gray-400">{formatDate(order.created_at)}</span>
+                        </div>
+                        <div className="flex flex-wrap gap-2 items-center mt-1">
+                          <span className="text-gray-900 text-sm font-medium truncate max-w-[120px]">{order.customer_name}</span>
+                          <span className="text-xs text-gray-500">{order.customer_email || order.customer_phone}</span>
+                        </div>
                       </div>
-                      <div className="text-right">
-                        <p className="font-medium">{formatPrice(order.total_money)}</p>
-                        <span className={`text-xs px-2 py-1 rounded-full ${getStatusColor(order.order_status)}`}>
-                          {getStatusLabel(order.order_status)}
-                        </span>
+                      <div className="flex flex-col items-end min-w-[120px]">
+                        <span className="font-semibold text-pink-600">{formatCurrency(order.total_money)}</span>
+                        <div className="flex gap-1 mt-1">
+                          <span className={`text-xs px-2 py-1 rounded-full ${getStatusColor(order.order_status)}`}>{getStatusLabel(order.order_status)}</span>
+                          <span className={`text-xs px-2 py-1 rounded-full ${order.payment_status === 1 ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>{order.payment_status === 1 ? 'Đã thanh toán' : 'Chưa thanh toán'}</span>
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -214,7 +230,7 @@ export default function AdminDashboard() {
           <Card>
             <CardHeader>
               <CardTitle>Sản phẩm bán chạy</CardTitle>
-              <CardDescription>Top 5 sản phẩm theo số lượng bán</CardDescription>
+              <CardDescription>Top sản phẩm theo số lượng bán</CardDescription>
             </CardHeader>
             <CardContent>
               {topProducts.length === 0 ? (
@@ -237,7 +253,7 @@ export default function AdminDashboard() {
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="font-medium text-pink-600">{formatPrice(product.sale_price || product.price)}</p>
+                        <p className="font-medium text-pink-600">{formatCurrency(product.sale_price || product.price)}</p>
                       </div>
                     </div>
                   ))}

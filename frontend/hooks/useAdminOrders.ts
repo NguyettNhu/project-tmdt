@@ -102,7 +102,7 @@ export function useUpdateOrderStatus() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    const updateStatus = async (orderId: number, newStatus: number) => {
+    const updateStatus = async (orderId: number, newStatus: number, type: 'order' | 'payment' = 'order') => {
         if (!isAuthenticated || !token) {
             return { success: false, message: 'Vui lòng đăng nhập' };
         }
@@ -111,6 +111,12 @@ export function useUpdateOrderStatus() {
         setError(null);
 
         try {
+            let body: any = {};
+            if (type === 'order') {
+                body.order_status = newStatus;
+            } else {
+                body.payment_status = newStatus;
+            }
             const response = await fetch(`${API_BASE_URL}/admin/orders/${orderId}/status`, {
                 method: 'PUT',
                 headers: {
@@ -118,7 +124,7 @@ export function useUpdateOrderStatus() {
                     'Authorization': `Bearer ${token}`,
                     'Accept': 'application/json',
                 },
-                body: JSON.stringify({ order_status: newStatus }),
+                body: JSON.stringify(body),
             });
 
             const data: ApiResponse<ApiOrder> = await response.json();

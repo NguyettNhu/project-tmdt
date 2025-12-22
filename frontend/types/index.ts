@@ -82,7 +82,7 @@ export interface ApiOrder {
     customer_email: string | null;
     customer_phone: string | null;
     customer_address: string | null;
-    order_status: number; // 0:Chờ xác nhận, 1:Đã xác nhận, 2:Đang giao, 3:Hoàn thành, 4:Hủy
+    order_status: number; // 0:Chờ xác nhận, 1:Đã xác nhận, 2:Đang giao, 3:Hoàn thành, 4:Hủy, 5:Đã nhận hàng
     payment_status: number; // 0:Chưa thanh toán, 1:Đã thanh toán, 2:Hoàn tiền
     payment_method: string | null;
     subtotal: number;

@@ -28,9 +28,9 @@
                                         style="width:50px;height:50px;object-fit:cover">
                                 </td>
                                 <td>{{ $detail->product->name }}</td>
-                                <td>{{ number_format($detail->price) }} VNĐ</td>
+                                <td>{{ number_format($detail->price, 0, ',', '.') }} đ</td>
                                 <td>{{ $detail->quantity }}</td>
-                                <td>{{ number_format($detail->total) }} VNĐ</td>
+                                <td>{{ number_format($detail->total, 0, ',', '.') }} đ</td>
                             </tr>
                         @endforeach
                     </tbody>

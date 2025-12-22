@@ -27,7 +27,7 @@
                                     <tr>
                                         <td>{{ $item->id }}</td>
                                         <td>{{ $item->customer->name ?? 'Khách lẻ' }}</td>
-                                        <td>{{ number_format($item->total_price) }} đ</td>
+                                        <td>{{ number_format($item->total_price, 0, ',', '.') }} đ</td>
 
                                         <td>
                                             @if ($item->order_status == 'completed')

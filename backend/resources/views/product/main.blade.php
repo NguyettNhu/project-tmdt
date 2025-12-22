@@ -38,9 +38,9 @@
 
                                         <td>{{ $item->name }}</td>
 
-                                        <td>{{ number_format($item->price) }} VNĐ</td>
+                                        <td>{{ number_format($item->price, 0, ',', '.') }} đ</td>
 
-                                        <td>{{ number_format($item->sale_price) }} VNĐ</td>
+                                        <td>{{ number_format($item->sale_price, 0, ',', '.') }} đ</td>
 
                                         <td>{{ $item->sold ?? 0 }}</td>
 

@@ -162,7 +162,7 @@ export default function Header() {
                                             setIsSearchOpen(!isSearchOpen);
                                         }
                                     }}
-                                    className="p-1.5 text-gray-500 hover:text-[#D9006C] transition-colors duration-200"
+                                    className="p-1.5 text-gray-500 hover:text-[#D9006C] transition-colors duration-200 lg:block md:hidden"
                                     aria-label="Search"
                                 >
                                     <Search className="w-5 h-5" />

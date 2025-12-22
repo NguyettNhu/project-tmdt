@@ -34,8 +34,17 @@
                                 <option value="pending" {{ $data->order_status == 'pending' ? 'selected' : '' }}>
                                     Chờ Xử Lý
                                 </option>
+                                <option value="confirmed" {{ $data->order_status == 'confirmed' ? 'selected' : '' }}>
+                                    Đã Xác Nhận
+                                </option>
+                                <option value="shipping" {{ $data->order_status == 'shipping' ? 'selected' : '' }}>
+                                    Đang Giao
+                                </option>
                                 <option value="completed" {{ $data->order_status == 'completed' ? 'selected' : '' }}>
                                     Hoàn Thành
+                                </option>
+                                <option value="delivered" {{ $data->order_status == 'delivered' ? 'selected' : '' }}>
+                                    Đã Nhận Hàng
                                 </option>
                                 <option value="cancelled" {{ $data->order_status == 'cancelled' ? 'selected' : '' }}>
                                     Hủy

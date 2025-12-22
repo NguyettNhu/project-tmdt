@@ -26,7 +26,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { usePosts } from '@/hooks/usePosts';
 import { ApiPost, getImageUrl } from '@/lib/api';
 import { createPost, deletePost, updatePost } from '@/services/post.service';
-import { Construction, Loader2, Percent } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { useState } from 'react';
 
 export default function ContentPage() {
@@ -138,13 +138,13 @@ export default function ContentPage() {
     <AdminLayout>
       <div className="space-y-6">
         <div>
-          <p className="text-gray-500 mt-1">Quản lý tin tức và khuyến mãi</p>
+          <h1 className="text-3xl font-bold text-gray-900">Quản lý tin tức</h1>
+          <p className="text-gray-500 mt-1">Tin tức nóng</p>
         </div>
 
         <Tabs defaultValue="articles" className="space-y-4">
           <TabsList>
             <TabsTrigger value="articles">Tin tức ({apiPosts.length})</TabsTrigger>
-            <TabsTrigger value="promotions">Khuyến mãi</TabsTrigger>
           </TabsList>
 
           {/* Articles Tab */}
@@ -184,17 +184,12 @@ export default function ContentPage() {
                           <TableRow key={article.id}>
                             <TableCell>
                               <div className="w-16 h-12 rounded overflow-hidden bg-gray-100">
-                                {article.image ? (
-                                  <img
-                                    src={getImageUrl(article.image, 'post')}
-                                    alt={article.name}
-                                    className="w-full h-full object-cover"
-                                  />
-                                ) : (
-                                  <div className="w-full h-full flex items-center justify-center text-gray-400">
-                                    📄
-                                  </div>
-                                )}
+                                <img
+                                  src={getImageUrl(article.image, 'post')}
+                                  alt={article.name}
+                                  className="w-full h-full object-cover"
+                                  onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/images/product-01.jpg'; }}
+                                />
                               </div>
                             </TableCell>
                             <TableCell className="font-medium max-w-md">
@@ -253,25 +248,6 @@ export default function ContentPage() {
                     )}
                   </TableBody>
                 </Table>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Promotions Tab */}
-          <TabsContent value="promotions" className="space-y-4">
-            <Card>
-              <CardContent className="py-16">
-                <div className="text-center">
-                  <Percent className="w-16 h-16 mx-auto text-green-500 mb-4" />
-                  <Construction className="w-8 h-8 mx-auto text-yellow-500 mb-4" />
-                  <h3 className="text-xl font-semibold text-gray-800 mb-2">
-                    Tính năng đang phát triển
-                  </h3>
-                  <p className="text-gray-500 max-w-md mx-auto">
-                    Chức năng quản lý khuyến mãi đang được phát triển.
-                    API khuyến mãi sẽ sớm được tích hợp từ hệ thống backend.
-                  </p>
-                </div>
               </CardContent>
             </Card>
           </TabsContent>

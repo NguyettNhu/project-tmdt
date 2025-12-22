@@ -48,4 +48,22 @@ class Order extends Model
     {
         return 'ORD-' . str_pad($this->id, 6, '0', STR_PAD_LEFT);
     }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::updated(function ($order) {
+            // Kiểm tra nếu order_status vừa thay đổi thành 'delivered'
+            if ($order->wasChanged('order_status') && $order->order_status === 'delivered') {
+                // Tăng số lượng đã bán cho từng sản phẩm trong đơn hàng
+                foreach ($order->orderDetails as $detail) {
+                    $product = $detail->product;
+                    if ($product) {
+                        $product->increment('sold', $detail->quantity);
+                    }
+                }
+            }
+        });
+    }
 }

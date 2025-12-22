@@ -193,10 +193,16 @@ export default function PaymentPage() {
         localStorage.removeItem('shippingInfo');
 
         // Save order info for confirmation page
+        type ApiOrderItem = {
+          product_id: number | null;
+          product_name?: string;
+          price: number;
+          quantity: number;
+        };
         localStorage.setItem('lastOrder', JSON.stringify({
           orderId: result.order.id || result.order.order_code,
-          items: result.order.items?.map((item: any) => ({
-            id: item.product_id,
+          items: result.order.items?.map((item: ApiOrderItem) => ({
+            id: item.product_id ?? 0,
             name: item.product_name || '',
             price: item.price,
             qty: item.quantity

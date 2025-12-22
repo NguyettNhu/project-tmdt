@@ -7,6 +7,7 @@ import { useCart } from '@/context/CartContext';
 import Link from 'next/link';
 import { Shirt } from 'lucide-react';
 import { toast } from 'sonner';
+import { formatCurrency } from '@/lib/orders';
 
 type ShippingMethod = {
   id: string;
@@ -405,7 +406,7 @@ export default function ShippingPage() {
                       <div className="flex items-center justify-between mb-1">
                         <span className="font-semibold text-gray-900">{method.name}</span>
                         <span className="font-bold text-[#D9006C]">
-                          {method.price === 0 ? 'Miễn phí' : `${method.price.toFixed(2)}đ`}
+                          {method.price === 0 ? 'Miễn phí' : formatCurrency(method.price)}
                         </span>
                       </div>
                       <p className="text-sm text-gray-600">{method.description}</p>
@@ -426,13 +427,17 @@ export default function ShippingPage() {
               <div className="space-y-4 mb-6 max-h-64 overflow-y-auto">
                 {items.map((item) => (
                   <div key={item.id} className="flex gap-3">
-                    <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center shrink-0">
-                      <Shirt className="w-8 h-8 text-gray-400" />
+                    <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center shrink-0 overflow-hidden">
+                      {item.image ? (
+                        <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                      ) : (
+                        <Shirt className="w-8 h-8 text-gray-400" />
+                      )}
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-gray-900 text-sm truncate">{item.name}</p>
                       <p className="text-sm text-gray-600">Số lượng: {item.qty}</p>
-                      <p className="font-semibold text-[#D9006C]">${(item.price * item.qty).toFixed(2)}</p>
+                      <p className="font-semibold text-[#D9006C]">{formatCurrency(item.price * item.qty)}</p>
                     </div>
                   </div>
                 ))}
@@ -442,17 +447,17 @@ export default function ShippingPage() {
               <div className="border-t border-gray-200 pt-4 space-y-3">
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">Tạm tính</span>
-                  <span className="font-semibold text-gray-900">${subtotal.toFixed(2)}</span>
+                  <span className="font-semibold text-gray-900">{formatCurrency(subtotal)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">Phí vận chuyển</span>
                   <span className="font-semibold text-gray-900">
-                    {shippingCost === 0 ? 'Miễn phí' : `${shippingCost.toFixed(2)}đ`}
+                    {shippingCost === 0 ? 'Miễn phí' : formatCurrency(shippingCost)}
                   </span>
                 </div>
                 <div className="flex justify-between text-lg font-bold pt-3 border-t border-gray-200">
                   <span className="text-gray-900">Tổng cộng</span>
-                  <span className="text-[#D9006C]">${finalTotal.toFixed(2)}</span>
+                  <span className="text-[#D9006C]">{formatCurrency(finalTotal)}</span>
                 </div>
               </div>
 

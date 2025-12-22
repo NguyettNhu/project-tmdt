@@ -14,19 +14,12 @@ import {
 } from '@/components/ui/table';
 import { useCategories } from '@/hooks/useCategories';
 import { getImageUrl } from '@/lib/api';
-import { Eye, FolderOpen, Loader2, Search, ToggleLeft, ToggleRight } from 'lucide-react';
+import { FolderOpen, Loader2, Search } from 'lucide-react';
 import { useState } from 'react';
 
 export default function CategoriesPage() {
   const { categories: apiCategories, loading, error, refetch } = useCategories();
   const [searchTerm, setSearchTerm] = useState('');
-
-
-  const handleToggleCategoryStatus = (id: number) => {
-    // TODO: Implement toggle status API call
-    console.log('Toggle category status:', id);
-  };
-
 
 
   const filteredCategories = apiCategories.filter(category =>
@@ -136,8 +129,6 @@ export default function CategoriesPage() {
                     <TableHead className="font-semibold">Tên danh mục</TableHead>
                     <TableHead className="font-semibold">Slug</TableHead>
                     <TableHead className="font-semibold">Loại</TableHead>
-                    <TableHead className="font-semibold text-center">Kích hoạt</TableHead>
-                    <TableHead className="font-semibold text-center">Hành động</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -178,35 +169,6 @@ export default function CategoriesPage() {
                         <span className="px-2 py-1 bg-blue-50 text-blue-600 rounded-full text-sm font-medium">
                           {category.type || 'Chung'}
                         </span>
-                      </TableCell>
-
-                      {/* Kích hoạt */}
-                      <TableCell className="text-center">
-                        <button
-                          onClick={() => handleToggleCategoryStatus(category.id)}
-                          className="inline-flex items-center justify-center"
-                        >
-                          {category.status === 1 ? (
-                            <ToggleRight className="w-8 h-8 text-green-500" />
-                          ) : (
-                            <ToggleLeft className="w-8 h-8 text-gray-400" />
-                          )}
-                        </button>
-                      </TableCell>
-
-                      {/* Hành động */}
-                      <TableCell>
-                        <div className="flex items-center justify-center gap-1">
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            className="h-8 w-8 p-0 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-                            title="Xem chi tiết"
-                          >
-                            <Eye className="w-4 h-4" />
-                          </Button>
-
-                        </div>
                       </TableCell>
                     </TableRow>
                   ))}

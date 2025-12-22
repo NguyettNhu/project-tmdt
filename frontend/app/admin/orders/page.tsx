@@ -28,9 +28,10 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { formatCurrency } from '@/lib/orders';
 import { useAdminOrders, useUpdateOrderStatus } from '@/hooks/useAdminOrders';
 import { ApiOrder } from '@/lib/api';
-import { Check, ChevronDown, Eye, Loader2, RefreshCw, Truck, XCircle } from 'lucide-react';
+import { Check, CheckCircle, ChevronDown, Eye, Loader2, Package, RefreshCw, Truck, XCircle } from 'lucide-react';
 import { useState } from 'react';
 
 export default function OrdersPage() {
@@ -41,15 +42,21 @@ export default function OrdersPage() {
   const [selectedOrder, setSelectedOrder] = useState<ApiOrder | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
 
-  const getStatusBadge = (status: number) => {
+  const getStatusBadge = (order: ApiOrder) => {
+    // Nếu đã thanh toán và đã xác nhận, hiển thị trạng thái đặc biệt
+    if (order.payment_status === 1 && order.order_status === 1) {
+      return { label: 'Đã thanh toán và đã xác nhận', variant: 'success' as const };
+    }
+
     const statusConfig: Record<number, { label: string; variant: 'warning' | 'default' | 'success' | 'destructive' }> = {
       0: { label: 'Chờ xác nhận', variant: 'warning' },
       1: { label: 'Đã xác nhận', variant: 'default' },
       2: { label: 'Đang giao', variant: 'default' },
       3: { label: 'Hoàn thành', variant: 'success' },
       4: { label: 'Đã hủy', variant: 'destructive' },
+      5: { label: 'Đã nhận hàng', variant: 'success' },
     };
-    return statusConfig[status] || { label: 'Không rõ', variant: 'default' as const };
+    return statusConfig[order.order_status] || { label: 'Không rõ', variant: 'default' as const };
   };
 
   const getPaymentStatusBadge = (status: number) => {
@@ -59,10 +66,6 @@ export default function OrdersPage() {
       2: { label: 'Hoàn tiền', variant: 'destructive' },
     };
     return statusConfig[status] || { label: 'Không rõ', variant: 'warning' as const };
-  };
-
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
   };
 
   const formatDate = (dateString: string) => {
@@ -77,14 +80,17 @@ export default function OrdersPage() {
     return matchesSearch && matchesStatus;
   });
 
-  const handleStatusChange = async (orderId: number, newStatus: number) => {
-    const result = await updateStatus(orderId, newStatus);
-    if (result.success) {
-      // Refresh orders list
-      await refetch();
-    } else {
-      alert(result.message || 'Cập nhật trạng thái thất bại');
-    }
+  // Updated handleStatusChange to update the status column dynamically
+  const handleStatusChange = (orderId: number, newStatus: number) => {
+    updateStatus(orderId, newStatus).then(() => {
+      refetch();
+    });
+  };
+
+  const handlePaymentStatusChange = (orderId: number, newPaymentStatus: number) => {
+    updateStatus(orderId, newPaymentStatus, 'payment').then(() => {
+      refetch();
+    });
   };
 
   const handleViewDetails = (order: ApiOrder) => {
@@ -142,7 +148,8 @@ export default function OrdersPage() {
                   <option value="1">Đã xác nhận</option>
                   <option value="2">Đang giao</option>
                   <option value="3">Hoàn thành</option>
-                  <option value="4">Đã hủy</option>
+                  <option value="4">Đã nhận hàng</option>
+                  <option value="5">Đã hủy</option>
                 </select>
               </div>
             </div>
@@ -169,7 +176,7 @@ export default function OrdersPage() {
                   </TableRow>
                 ) : (
                   filteredOrders.map((order) => {
-                    const statusInfo = getStatusBadge(order.order_status);
+                    const statusInfo = getStatusBadge(order);
                     const paymentInfo = getPaymentStatusBadge(order.payment_status);
                     return (
                       <TableRow key={order.id}>
@@ -181,9 +188,33 @@ export default function OrdersPage() {
                           </div>
                         </TableCell>
                         <TableCell>{formatDate(order.created_at)}</TableCell>
-                        <TableCell className="font-medium">{formatPrice(order.total_money)}</TableCell>
+                        <TableCell className="font-medium">{formatCurrency(order.total_money)}</TableCell>
                         <TableCell>
-                          <Badge variant={paymentInfo.variant} className="px-3 py-1">{paymentInfo.label}</Badge>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <span style={{ cursor: 'pointer' }}>
+                                <Badge variant={paymentInfo.variant} className="px-3 py-1">{paymentInfo.label}</Badge>
+                              </span>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-56">
+                              <DropdownMenuLabel className="text-gray-700">Chọn trạng thái thanh toán</DropdownMenuLabel>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem
+                                onClick={() => handlePaymentStatusChange(order.id, 0)}
+                                className="cursor-pointer hover:bg-yellow-50 hover:text-yellow-700"
+                              >
+                                <Check className="w-4 h-4 mr-2" />
+                                Chưa thanh toán
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => handlePaymentStatusChange(order.id, 1)}
+                                className="cursor-pointer hover:bg-green-50 hover:text-green-700"
+                              >
+                                <Check className="w-4 h-4 mr-2" />
+                                Đã thanh toán
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </TableCell>
                         <TableCell>
                           <Badge variant={statusInfo.variant} className="px-3 py-1">{statusInfo.label}</Badge>
@@ -222,43 +253,87 @@ export default function OrdersPage() {
                                   Thay đổi trạng thái
                                 </DropdownMenuLabel>
                                 <DropdownMenuSeparator />
-                                {order.order_status === 0 && (
-                                  <DropdownMenuItem
-                                    onClick={() => handleStatusChange(order.id, 1)}
-                                    className="cursor-pointer hover:bg-green-50 hover:text-green-700"
-                                  >
-                                    <Check className="w-4 h-4 mr-2" />
-                                    Xác nhận đơn hàng
-                                  </DropdownMenuItem>
-                                )}
-                                {(order.order_status === 1 || order.order_status === 0) && (
-                                  <DropdownMenuItem
-                                    onClick={() => handleStatusChange(order.id, 2)}
-                                    className="cursor-pointer hover:bg-blue-50 hover:text-blue-700"
-                                  >
-                                    <Truck className="w-4 h-4 mr-2" />
-                                    Chuyển sang Đang giao
-                                  </DropdownMenuItem>
-                                )}
-                                {order.order_status === 2 && (
-                                  <DropdownMenuItem
-                                    onClick={() => handleStatusChange(order.id, 3)}
-                                    className="cursor-pointer hover:bg-green-50 hover:text-green-700"
-                                  >
-                                    <Check className="w-4 h-4 mr-2" />
-                                    Hoàn thành đơn hàng
-                                  </DropdownMenuItem>
-                                )}
+                                <DropdownMenuItem
+                                  onClick={() => handleStatusChange(order.id, 0)}
+                                  className="cursor-pointer hover:bg-yellow-50 hover:text-yellow-700"
+                                >
+                                  <Check className="w-4 h-4 mr-2" />
+                                  Chưa xác nhận
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() => handleStatusChange(order.id, 1)}
+                                  className="cursor-pointer hover:bg-green-50 hover:text-green-700"
+                                >
+                                  <Check className="w-4 h-4 mr-2" />
+                                  Xác nhận thành công
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() => handleStatusChange(order.id, 2)}
+                                  className="cursor-pointer hover:bg-blue-50 hover:text-blue-700"
+                                >
+                                  <Truck className="w-4 h-4 mr-2" />
+                                  Đang giao hàng
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() => handleStatusChange(order.id, 3)}
+                                  className="cursor-pointer hover:bg-green-50 hover:text-green-700"
+                                >
+                                  <CheckCircle className="w-4 h-4 mr-2" />
+                                  Hoàn thành
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() => handleStatusChange(order.id, 5)}
+                                  className="cursor-pointer hover:bg-green-50 hover:text-green-700"
+                                >
+                                  <Package className="w-4 h-4 mr-2" />
+                                  Đã nhận hàng
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() => handleStatusChange(order.id, 4)}
+                                  className="text-red-600 cursor-pointer hover:bg-red-50 focus:bg-red-50 focus:text-red-700"
+                                >
+                                  <XCircle className="w-4 h-4 mr-2" />
+                                  Đã hủy
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="btn-admin-action btn-admin-edit"
+                                  disabled={updating}
+                                >
+                                  {updating ? (
+                                    <Loader2 className="w-4 h-4 mr-1.5 animate-spin" />
+                                  ) : (
+                                    <RefreshCw className="w-4 h-4 mr-1.5" />
+                                  )}
+                                  Thanh toán
+                                  <ChevronDown className="w-3 h-3 ml-1.5" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end" className="w-56">
+                                <DropdownMenuLabel className="text-gray-700">
+                                  <RefreshCw className="w-4 h-4 inline mr-2" />
+                                  Thay đổi trạng thái thanh toán
+                                </DropdownMenuLabel>
                                 <DropdownMenuSeparator />
-                                {order.order_status !== 3 && order.order_status !== 4 && (
-                                  <DropdownMenuItem
-                                    onClick={() => handleStatusChange(order.id, 4)}
-                                    className="text-red-600 cursor-pointer hover:bg-red-50 focus:bg-red-50 focus:text-red-700"
-                                  >
-                                    <XCircle className="w-4 h-4 mr-2" />
-                                    Hủy đơn hàng
-                                  </DropdownMenuItem>
-                                )}
+                                <DropdownMenuItem
+                                  onClick={() => handlePaymentStatusChange(order.id, 0)}
+                                  className="cursor-pointer hover:bg-yellow-50 hover:text-yellow-700"
+                                >
+                                  <Check className="w-4 h-4 mr-2" />
+                                  Chưa thanh toán
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() => handlePaymentStatusChange(order.id, 1)}
+                                  className="cursor-pointer hover:bg-green-50 hover:text-green-700"
+                                >
+                                  <Check className="w-4 h-4 mr-2" />
+                                  Đã thanh toán
+                                </DropdownMenuItem>
                               </DropdownMenuContent>
                             </DropdownMenu>
                           </div>
@@ -296,7 +371,7 @@ export default function OrdersPage() {
                   <h4 className="font-semibold mb-2">Thông tin đơn hàng</h4>
                   <p><strong>Ngày đặt:</strong> {formatDate(selectedOrder.created_at)}</p>
                   <p><strong>Phương thức:</strong> {selectedOrder.payment_method || 'COD'}</p>
-                  <p><strong>Trạng thái:</strong> <Badge variant={getStatusBadge(selectedOrder.order_status).variant}>{getStatusBadge(selectedOrder.order_status).label}</Badge></p>
+                  <p><strong>Trạng thái:</strong> <Badge variant={getStatusBadge(selectedOrder).variant}>{getStatusBadge(selectedOrder).label}</Badge></p>
                   <p><strong>Thanh toán:</strong> <Badge variant={getPaymentStatusBadge(selectedOrder.payment_status).variant}>{getPaymentStatusBadge(selectedOrder.payment_status).label}</Badge></p>
                 </div>
               </div>
@@ -306,19 +381,19 @@ export default function OrdersPage() {
                 <div className="bg-gray-50 p-4 rounded-lg space-y-2">
                   <div className="flex justify-between">
                     <span>Tạm tính:</span>
-                    <span>{formatPrice(selectedOrder.subtotal)}</span>
+                    <span>{formatCurrency(selectedOrder.subtotal)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Giảm giá:</span>
-                    <span className="text-red-500">-{formatPrice(selectedOrder.discount)}</span>
+                    <span className="text-red-500">-{formatCurrency(selectedOrder.discount)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Phí vận chuyển:</span>
-                    <span>{formatPrice(selectedOrder.shipping_fee)}</span>
+                    <span>{formatCurrency(selectedOrder.shipping_fee)}</span>
                   </div>
                   <div className="flex justify-between font-bold text-lg border-t pt-2">
                     <span>Tổng cộng:</span>
-                    <span className="text-pink-600">{formatPrice(selectedOrder.total_money)}</span>
+                    <span className="text-pink-600">{formatCurrency(selectedOrder.total_money)}</span>
                   </div>
                 </div>
               </div>

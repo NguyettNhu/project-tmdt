@@ -17,8 +17,8 @@
                 <td>{{ $k + 1 }}</td>
                 <td>{{ $item->product->name }}</td>
                 <td>{{ $item->quantity }}</td>
-                <td>{{ number_format($item->price) }} VND</td>
-                <td>{{ number_format($item->price * $item->quantity) }} VND</td>
+                <td>{{ number_format($item->price, 0, ',', '.') }} đ</td>
+                <td>{{ number_format($item->price * $item->quantity, 0, ',', '.') }} đ</td>
             </tr>
         @endforeach
     </tbody>

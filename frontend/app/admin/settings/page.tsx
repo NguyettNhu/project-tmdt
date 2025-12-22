@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import AdminLayout from '@/components/layout/AdminLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -36,6 +37,13 @@ interface WebsiteSettings {
 }
 
 export default function SettingsPage() {
+  const router = useRouter();
+
+  useEffect(() => {
+    // Redirect to admin dashboard or 404
+    router.push('/admin');
+  }, [router]);
+
   const [settings, setSettings] = useState<WebsiteSettings>({
     siteName: 'Fashion Store',
     siteDescription: 'Cửa hàng thời trang trực tuyến uy tín',
