@@ -33,7 +33,7 @@ Route::prefix('admin')->group(function () {
         // Reuse existing controllers for read-only admin access for now
         Route::apiResource('/products', ProductController::class);
         Route::apiResource('/categories', CategoryController::class)->only(['index', 'show']);
-        Route::apiResource('/posts', PostController::class)->only(['index', 'show']);
+        Route::apiResource('/posts', PostController::class);
         Route::apiResource('/orders', \App\Http\Controllers\Api\OrderController::class)->only(['index', 'show']);
         Route::put('/orders/{id}/status', [\App\Http\Controllers\Api\OrderController::class, 'updateStatus']);
     });

@@ -1,6 +1,7 @@
 'use client';
 
 import { Review } from '@/types';
+import { getImageUrl } from '@/utils/image-utils';
 import { CheckCircle, Star, ThumbsUp } from 'lucide-react';
 import Image from 'next/image';
 import { useState } from 'react';
@@ -37,8 +38,8 @@ export default function ReviewCard({ review }: ReviewCardProps) {
                     <Star
                         key={star}
                         className={`w-4 h-4 ${star <= rating
-                                ? 'fill-yellow-400 text-yellow-400'
-                                : 'fill-gray-200 text-gray-200'
+                            ? 'fill-yellow-400 text-yellow-400'
+                            : 'fill-gray-200 text-gray-200'
                             }`}
                     />
                 ))}
@@ -54,11 +55,12 @@ export default function ReviewCard({ review }: ReviewCardProps) {
                 <div className="flex-shrink-0">
                     {review.userAvatar ? (
                         <Image
-                            src={review.userAvatar}
+                            src={getImageUrl(review.userAvatar, 'user')}
                             alt={review.userName}
                             width={48}
                             height={48}
                             className="rounded-full"
+                            unoptimized
                         />
                     ) : (
                         <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center text-white font-bold text-lg">
@@ -114,10 +116,11 @@ export default function ReviewCard({ review }: ReviewCardProps) {
                                     className="relative w-20 h-20 rounded-lg overflow-hidden border border-gray-200 cursor-pointer hover:opacity-80 transition-opacity"
                                 >
                                     <Image
-                                        src={image}
+                                        src={getImageUrl(image?.replace('uploads/product/', 'uploads/reviews/'), 'review')}
                                         alt={`Review image ${index + 1}`}
                                         fill
                                         className="object-cover"
+                                        unoptimized
                                     />
                                 </div>
                             ))}
@@ -138,8 +141,8 @@ export default function ReviewCard({ review }: ReviewCardProps) {
                     onClick={handleHelpful}
                     disabled={hasVoted}
                     className={`inline-flex items-center gap-2 text-sm px-4 py-2 rounded-lg transition-colors ${hasVoted
-                            ? 'bg-gray-100 text-gray-500 cursor-not-allowed'
-                            : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
+                        ? 'bg-gray-100 text-gray-500 cursor-not-allowed'
+                        : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
                         }`}
                 >
                     <ThumbsUp className={`w-4 h-4 ${hasVoted ? 'fill-gray-500' : ''}`} />

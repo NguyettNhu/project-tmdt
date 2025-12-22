@@ -10,8 +10,8 @@ services:
       - "3000:3000"
     environment:
       NODE_ENV: ${NODE_ENV:-production}
-      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8000/api}
-      API_URL_INTERNAL: ${API_URL_INTERNAL:-http://nginx/api}
+      NEXT_PUBLIC_API_URL: /api
+      API_URL_INTERNAL: ${API_URL_INTERNAL:-http://nginx:80/api}
     depends_on:
       - app
       - nginx

@@ -25,6 +25,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { usePosts } from '@/hooks/usePosts';
 import { ApiPost, getImageUrl } from '@/lib/api';
+import { createPost, deletePost, updatePost } from '@/services/post.service';
 import { Construction, Loader2, Percent } from 'lucide-react';
 import { useState } from 'react';
 
@@ -32,22 +33,74 @@ export default function ContentPage() {
   const { posts: apiPosts, loading, error, refetch } = usePosts();
   const [isArticleDialogOpen, setIsArticleDialogOpen] = useState(false);
   const [editingArticle, setEditingArticle] = useState<ApiPost | null>(null);
+  const [formData, setFormData] = useState({
+    name: '',
+    slug: '',
+    description: '',
+    content: '',
+    image: null as File | null,
+  });
 
-  const handleDeleteArticle = (id: number) => {
+  const handleDeleteArticle = async (id: number) => {
     if (confirm('Bạn có chắc muốn xóa bài viết này?')) {
-      // TODO: Implement API call to delete article
-      console.log('Delete article:', id);
+      try {
+        await deletePost(id);
+        refetch();
+      } catch (error) {
+        console.error('Failed to delete article:', error);
+        alert('Có lỗi xảy ra khi xóa bài viết');
+      }
     }
   };
 
-  const handleToggleArticleStatus = (id: number, status: number) => {
-    // TODO: Implement API call to toggle article status
-    console.log('Toggle article status:', id, status);
+  const handleToggleArticleStatus = async (id: number, status: number) => {
+    try {
+      const data = new FormData();
+      data.append('status', status.toString());
+      await updatePost(id, data);
+      refetch();
+    } catch (error) {
+      console.error('Failed to update status:', error);
+      alert('Có lỗi xảy ra khi cập nhật trạng thái');
+    }
   };
 
   const handleOpenArticleDialog = (article?: ApiPost) => {
     setEditingArticle(article || null);
+    setFormData({
+      name: article?.name || '',
+      slug: article?.slug || '',
+      description: article?.description || '',
+      content: article?.content || '',
+      image: null,
+    });
     setIsArticleDialogOpen(true);
+  };
+
+  const handleSaveArticle = async () => {
+    try {
+      const data = new FormData();
+      data.append('name', formData.name);
+      data.append('slug', formData.slug);
+      data.append('description', formData.description);
+      data.append('content', formData.content);
+      data.append('status', '1'); // Default to published status
+      if (formData.image) {
+        data.append('image', formData.image);
+      }
+
+      if (editingArticle) {
+        await updatePost(editingArticle.id, data);
+      } else {
+        await createPost(data);
+      }
+
+      setIsArticleDialogOpen(false);
+      refetch();
+    } catch (error) {
+      console.error('Failed to save article:', error);
+      alert('Có lỗi xảy ra khi lưu bài viết');
+    }
   };
 
   const formatDate = (dateString: string) => {
@@ -243,7 +296,8 @@ export default function ContentPage() {
               </Label>
               <Input
                 id="article-title"
-                defaultValue={editingArticle?.name}
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 placeholder="Nhập tiêu đề bài viết"
                 className="col-span-3"
               />
@@ -254,7 +308,8 @@ export default function ContentPage() {
               </Label>
               <Input
                 id="article-slug"
-                defaultValue={editingArticle?.slug}
+                value={formData.slug}
+                onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
                 placeholder="tieu-de-bai-viet"
                 className="col-span-3"
               />
@@ -265,7 +320,8 @@ export default function ContentPage() {
               </Label>
               <Input
                 id="article-desc"
-                defaultValue={editingArticle?.description || ''}
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 placeholder="Mô tả ngắn"
                 className="col-span-3"
               />
@@ -276,7 +332,8 @@ export default function ContentPage() {
               </Label>
               <textarea
                 id="article-content"
-                defaultValue={editingArticle?.content || ''}
+                value={formData.content}
+                onChange={(e) => setFormData({ ...formData, content: e.target.value })}
                 placeholder="Nội dung bài viết..."
                 className="col-span-3 min-h-[200px] px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
               />
@@ -291,6 +348,11 @@ export default function ContentPage() {
                   type="file"
                   accept="image/*"
                   className="cursor-pointer"
+                  onChange={(e) => {
+                    if (e.target.files && e.target.files[0]) {
+                      setFormData({ ...formData, image: e.target.files[0] });
+                    }
+                  }}
                 />
               </div>
             </div>
@@ -300,7 +362,7 @@ export default function ContentPage() {
               Hủy
             </Button>
             <Button
-              onClick={() => setIsArticleDialogOpen(false)}
+              onClick={handleSaveArticle}
               className="bg-pink-500 hover:bg-pink-600"
             >
               {editingArticle ? 'Cập nhật' : 'Đăng bài'}

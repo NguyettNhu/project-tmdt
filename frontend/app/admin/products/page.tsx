@@ -130,7 +130,8 @@ export default function ProductsPage() {
     product.slug.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const productCategories = apiCategories.filter(c => c.type === 'product');
+  // Don't filter by type since backend might not return type or type might be null
+  const productCategories = apiCategories;
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
@@ -241,22 +242,22 @@ export default function ProductsPage() {
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center justify-center gap-2">
-                          <button 
-                            className="p-2 rounded-lg text-blue-600 hover:text-blue-700 hover:bg-blue-50 transition-colors" 
+                          <button
+                            className="p-2 rounded-lg text-blue-600 hover:text-blue-700 hover:bg-blue-50 transition-colors"
                             title="Xem chi tiết"
                           >
                             <Eye className="w-5 h-5" />
                           </button>
-                          <button 
-                            className="p-2 rounded-lg text-amber-600 hover:text-amber-700 hover:bg-amber-50 transition-colors" 
-                            onClick={() => handleOpenProductDialog(product)} 
+                          <button
+                            className="p-2 rounded-lg text-amber-600 hover:text-amber-700 hover:bg-amber-50 transition-colors"
+                            onClick={() => handleOpenProductDialog(product)}
                             title="Chỉnh sửa"
                           >
                             <Edit className="w-5 h-5" />
                           </button>
-                          <button 
-                            className="p-2 rounded-lg text-red-600 hover:text-red-700 hover:bg-red-50 transition-colors" 
-                            onClick={() => handleDeleteProduct(product.id)} 
+                          <button
+                            className="p-2 rounded-lg text-red-600 hover:text-red-700 hover:bg-red-50 transition-colors"
+                            onClick={() => handleDeleteProduct(product.id)}
                             title="Xóa"
                           >
                             <Trash2 className="w-5 h-5" />

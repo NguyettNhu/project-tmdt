@@ -1,6 +1,6 @@
 export const API_BASE_URL = (typeof window === 'undefined' && process.env.API_URL_INTERNAL)
     ? process.env.API_URL_INTERNAL
-    : (process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api');
+    : (process.env.NEXT_PUBLIC_API_URL || '/api');
 
 // Helper to get admin token from localStorage
 export function getAdminToken(): string | null {
@@ -13,11 +13,19 @@ export async function fetchApi<T>(endpoint: string, options?: RequestInit & { re
     const url = `${API_BASE_URL}${endpoint}`;
     const { requireAuth, ...fetchOptions } = options || {};
 
-    const headers: HeadersInit = {
-        'Content-Type': 'application/json',
+    const headers: Record<string, string> = {
         'Accept': 'application/json',
-        ...fetchOptions?.headers,
     };
+
+    // Only set Content-Type to application/json if body is not FormData
+    if (!(fetchOptions?.body instanceof FormData)) {
+        headers['Content-Type'] = 'application/json';
+    }
+
+    // Merge custom headers
+    if (fetchOptions?.headers) {
+        Object.assign(headers, fetchOptions.headers);
+    }
 
     // Add admin token if required
     if (requireAuth) {
@@ -31,6 +39,7 @@ export async function fetchApi<T>(endpoint: string, options?: RequestInit & { re
         const response = await fetch(url, {
             ...fetchOptions,
             headers,
+            cache: 'no-store',
         });
 
         if (!response.ok) {
