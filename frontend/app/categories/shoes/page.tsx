@@ -38,10 +38,10 @@ export default function ShoesCategoryPage() {
 
   const priceRanges = useMemo(() => [
     { id: 'all', label: 'Tất cả', min: 0, max: Infinity },
-    { id: '0-50', label: 'Dưới $50', min: 0, max: 50 },
-    { id: '50-100', label: '$50 - $100', min: 50, max: 100 },
-    { id: '100-200', label: '$100 - $200', min: 100, max: 200 },
-    { id: '200+', label: 'Trên $200', min: 200, max: Infinity }
+    { id: '0-1150000', label: 'Dưới 1,150,000đ', min: 0, max: 1150000 },
+    { id: '1150000-2300000', label: '1,150,000đ - 2,300,000đ', min: 1150000, max: 2300000 },
+    { id: '2300000-4600000', label: '2,300,000đ - 4,600,000đ', min: 2300000, max: 4600000 },
+    { id: '4600000+', label: 'Trên 4,600,000đ', min: 4600000, max: Infinity }
   ], []);
 
   const filteredAndSortedProducts = useMemo(() => {

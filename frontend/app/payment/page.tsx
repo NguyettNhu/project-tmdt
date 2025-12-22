@@ -6,8 +6,10 @@ import Header from '@/components/layout/Header';
 import { useCart } from '@/context/CartContext';
 import Link from 'next/link';
 import { Check, Shirt } from 'lucide-react';
-import { formatCurrency } from '@/lib/orders';
+import { useCreateOrder } from '@/hooks/useOrders';
+import { useAuth } from '@/context/AuthContext';
 import { toast } from 'sonner';
+import { formatCurrency } from '@/lib/orders';
 
 type PaymentMethod = 'credit-card' | 'paypal' | 'cod';
 
@@ -25,9 +27,25 @@ type ShippingInfo = {
   shippingCost: number;
 };
 
+// Helper function to map payment method to API format
+const mapPaymentMethod = (method: PaymentMethod): 'cod' | 'bank_transfer' | 'credit_card' => {
+  switch (method) {
+    case 'credit-card':
+      return 'credit_card';
+    case 'paypal':
+      return 'bank_transfer';
+    case 'cod':
+      return 'cod';
+    default:
+      return 'cod'; // fallback
+  }
+};
+
 export default function PaymentPage() {
   const router = useRouter();
   const { items, subtotal, clearCart } = useCart();
+  const { customer } = useAuth();
+  const { createOrder, loading: creatingOrder } = useCreateOrder();
   
   const [shippingInfo] = useState<ShippingInfo | null>(() => {
     if (typeof window !== 'undefined') {
@@ -135,39 +153,74 @@ export default function PaymentPage() {
       return;
     }
 
+    if (!customer) {
+      toast.error('Vui lòng đăng nhập để đặt hàng');
+      router.push('/auth/login');
+      return;
+    }
+
     if (!validateCardInfo()) {
       return;
     }
 
     setIsProcessing(true);
 
-    // Simulate payment processing
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    try {
+      // Prepare order data for API
+      const orderData = {
+        customer_id: customer.id,
+        customer_name: shippingInfo?.fullName || '',
+        customer_phone: shippingInfo?.phone || '',
+        customer_address: `${shippingInfo?.address}, ${shippingInfo?.ward}, ${shippingInfo?.district}, ${shippingInfo?.city}`,
+        payment_method: mapPaymentMethod(selectedPayment),
+        note: shippingInfo?.notes || '',
+        items: items.map(item => ({
+          product_id: item.id,
+          product_name: item.name,
+          price: item.price,
+          quantity: item.qty
+        }))
+      };
 
-    // Create order data
-    const orderData = {
-      orderId: 'ORD-' + Date.now(),
-      items,
-      subtotal,
-      shippingCost: shippingInfo?.shippingCost || 0,
-      total: subtotal + (shippingInfo?.shippingCost || 0),
-      shippingInfo,
-      paymentMethod: selectedPayment,
-      orderDate: new Date().toISOString(),
-      status: 'confirmed'
-    };
+      // Create order via API
+      const result = await createOrder(orderData);
 
-    // Save order to localStorage
-    localStorage.setItem('lastOrder', JSON.stringify(orderData));
-    
-    // Clear cart
-    clearCart();
-    
-    // Clear shipping info
-    localStorage.removeItem('shippingInfo');
+      if (result.success && result.order) {
+        // Clear cart
+        clearCart();
+        
+        // Clear shipping info
+        localStorage.removeItem('shippingInfo');
 
-    // Redirect to confirmation
-    router.push('/order-confirmation');
+        // Save order info for confirmation page
+        localStorage.setItem('lastOrder', JSON.stringify({
+          orderId: result.order.id || result.order.order_code,
+          items: result.order.items?.map((item: any) => ({
+            id: item.product_id,
+            name: item.product_name || '',
+            price: item.price,
+            qty: item.quantity
+          })) || items,
+          subtotal,
+          shippingCost: shippingInfo?.shippingCost || 0,
+          total: subtotal + (shippingInfo?.shippingCost || 0),
+          shippingInfo,
+          paymentMethod: selectedPayment,
+          orderDate: new Date().toISOString(),
+          status: 'confirmed'
+        }));
+
+        toast.success('Đặt hàng thành công!');
+        router.push('/order-confirmation');
+      } else {
+        toast.error(result.message || 'Đặt hàng thất bại');
+      }
+    } catch (error) {
+      toast.error('Có lỗi xảy ra khi đặt hàng');
+      console.error('Order creation error:', error);
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   if (!shippingInfo || items.length === 0) {
@@ -479,10 +532,10 @@ export default function PaymentPage() {
               <div className="space-y-3">
                 <button
                   onClick={handleSubmitPayment}
-                  disabled={isProcessing || !agreeTerms}
+                  disabled={isProcessing || creatingOrder || !agreeTerms}
                   className="w-full bg-linear-to-r from-[#D9006C] to-[#FF1A7A] text-white font-bold py-4 rounded-xl hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
-                  {isProcessing ? (
+                  {isProcessing || creatingOrder ? (
                     <>
                       <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
                       <span>Đang xử lý...</span>

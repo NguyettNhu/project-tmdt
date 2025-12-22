@@ -38,10 +38,10 @@ export default function HatsCategoryPage() {
 
   const priceRanges = useMemo(() => [
     { id: 'all', label: 'Tất cả', min: 0, max: Infinity },
-    { id: '0-20', label: 'Dưới $20', min: 0, max: 20 },
-    { id: '20-50', label: '$20 - $50', min: 20, max: 50 },
-    { id: '50-100', label: '$50 - $100', min: 50, max: 100 },
-    { id: '100+', label: 'Trên $100', min: 100, max: Infinity }
+    { id: '0-460000', label: 'Dưới 460,000đ', min: 0, max: 460000 },
+    { id: '460000-1150000', label: '460,000đ - 1,150,000đ', min: 460000, max: 1150000 },
+    { id: '1150000-2300000', label: '1,150,000đ - 2,300,000đ', min: 1150000, max: 2300000 },
+    { id: '2300000+', label: 'Trên 2,300,000đ', min: 2300000, max: Infinity }
   ], []);
 
   const filteredAndSortedProducts = useMemo(() => {
