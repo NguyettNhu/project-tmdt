@@ -1,0 +1,245 @@
+-- SQL to create all tables based on Laravel migrations
+
+-- Users table
+CREATE TABLE users (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    email_verified_at TIMESTAMP NULL,
+    password VARCHAR(255) NOT NULL,
+    remember_token VARCHAR(100) NULL,
+    created_at TIMESTAMP NULL,
+    updated_at TIMESTAMP NULL,
+    status BOOLEAN DEFAULT FALSE,
+    image VARCHAR(255) NULL,
+    role VARCHAR(255) DEFAULT 'user'
+);
+
+-- Password reset tokens table
+CREATE TABLE password_reset_tokens (
+    email VARCHAR(255) PRIMARY KEY,
+    token VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP NULL
+);
+
+-- Sessions table
+CREATE TABLE sessions (
+    id VARCHAR(255) PRIMARY KEY,
+    user_id BIGINT UNSIGNED NULL,
+    ip_address VARCHAR(45) NULL,
+    user_agent TEXT NULL,
+    payload LONGTEXT NOT NULL,
+    last_activity INT NOT NULL,
+    INDEX idx_sessions_user_id (user_id),
+    INDEX idx_sessions_last_activity (last_activity)
+);
+
+-- Cache table
+CREATE TABLE cache (
+    `key` VARCHAR(255) PRIMARY KEY,
+    value MEDIUMTEXT NOT NULL,
+    expiration INT NOT NULL
+);
+
+-- Cache locks table
+CREATE TABLE cache_locks (
+    `key` VARCHAR(255) PRIMARY KEY,
+    owner VARCHAR(255) NOT NULL,
+    expiration INT NOT NULL
+);
+
+-- Jobs table
+CREATE TABLE jobs (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    queue VARCHAR(255) NOT NULL,
+    payload LONGTEXT NOT NULL,
+    attempts TINYINT UNSIGNED NOT NULL,
+    reserved_at INT UNSIGNED NULL,
+    available_at INT UNSIGNED NOT NULL,
+    created_at INT UNSIGNED NOT NULL,
+    INDEX idx_jobs_queue (queue)
+);
+
+-- Job batches table
+CREATE TABLE job_batches (
+    id VARCHAR(255) PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    total_jobs INT NOT NULL,
+    pending_jobs INT NOT NULL,
+    failed_jobs INT NOT NULL,
+    failed_job_ids LONGTEXT NOT NULL,
+    options MEDIUMTEXT NULL,
+    cancelled_at INT NULL,
+    created_at INT NOT NULL,
+    finished_at INT NULL
+);
+
+-- Failed jobs table
+CREATE TABLE failed_jobs (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    uuid VARCHAR(255) NOT NULL UNIQUE,
+    connection TEXT NOT NULL,
+    queue TEXT NOT NULL,
+    payload LONGTEXT NOT NULL,
+    exception LONGTEXT NOT NULL,
+    failed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Products table
+CREATE TABLE products (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    slug VARCHAR(255) NOT NULL UNIQUE,
+    avatar VARCHAR(255) NULL,
+    description TEXT NULL,
+    content TEXT NULL,
+    price INT DEFAULT 0,
+    sale_price INT NULL,
+    status TINYINT DEFAULT 1,
+    created_at TIMESTAMP NULL,
+    updated_at TIMESTAMP NULL,
+    parent_id BIGINT UNSIGNED NULL,
+    created_by BIGINT UNSIGNED NULL,
+    updated_by BIGINT UNSIGNED NULL,
+    sold INT NULL
+);
+
+-- Categories table
+CREATE TABLE categories (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL UNIQUE,
+    slug VARCHAR(255) NOT NULL UNIQUE,
+    status BOOLEAN DEFAULT TRUE,
+    content LONGTEXT NULL,
+    type VARCHAR(255) NULL,
+    parent_id BIGINT UNSIGNED NULL,
+    created_by BIGINT UNSIGNED DEFAULT 0,
+    updated_by BIGINT UNSIGNED DEFAULT 0,
+    created_at TIMESTAMP NULL,
+    updated_at TIMESTAMP NULL,
+    image VARCHAR(255) NULL
+);
+
+-- Posts table
+CREATE TABLE posts (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL UNIQUE,
+    slug VARCHAR(255) NOT NULL UNIQUE,
+    description TEXT NULL,
+    content LONGTEXT NULL,
+    image VARCHAR(255) NULL,
+    status BOOLEAN DEFAULT TRUE,
+    parent_id BIGINT UNSIGNED NULL,
+    created_by BIGINT UNSIGNED NULL,
+    updated_by BIGINT UNSIGNED NULL,
+    created_at TIMESTAMP NULL,
+    updated_at TIMESTAMP NULL
+);
+
+-- Menu table
+CREATE TABLE menu (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    path VARCHAR(255) NOT NULL,
+    icon VARCHAR(255) NULL,
+    color VARCHAR(255) NULL,
+    parent_id BIGINT UNSIGNED NULL,
+    type VARCHAR(255) NULL,
+    sort INT DEFAULT 0,
+    status BOOLEAN DEFAULT TRUE,
+    created_by BIGINT UNSIGNED NULL,
+    updated_by BIGINT UNSIGNED NULL,
+    created_at TIMESTAMP NULL,
+    updated_at TIMESTAMP NULL
+);
+
+-- Settings table
+CREATE TABLE settings (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    `key` VARCHAR(255) NOT NULL UNIQUE,
+    value TEXT NULL,
+    type VARCHAR(255) NULL,
+    created_by BIGINT UNSIGNED NULL,
+    updated_by BIGINT UNSIGNED NULL,
+    created_at TIMESTAMP NULL,
+    updated_at TIMESTAMP NULL
+);
+
+-- Customers table
+CREATE TABLE customers (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    email_verified_at TIMESTAMP NULL,
+    password VARCHAR(255) NOT NULL,
+    status BOOLEAN DEFAULT FALSE,
+    remember_token VARCHAR(100) NULL,
+    image VARCHAR(255) NULL,
+    created_at TIMESTAMP NULL,
+    updated_at TIMESTAMP NULL,
+    phone VARCHAR(20) NULL,
+    address VARCHAR(255) NULL
+);
+
+-- Orders table
+CREATE TABLE orders (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    customer_id BIGINT UNSIGNED NOT NULL,
+    total_price DECIMAL(15,2) DEFAULT 0,
+    order_status VARCHAR(255) DEFAULT 'pending',
+    payment_status TINYINT DEFAULT 0,
+    note TEXT NULL,
+    created_by BIGINT UNSIGNED NULL,
+    updated_by BIGINT UNSIGNED NULL,
+    created_at TIMESTAMP NULL,
+    updated_at TIMESTAMP NULL,
+    FOREIGN KEY (customer_id) REFERENCES customers(id) ON DELETE CASCADE,
+    FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL,
+    FOREIGN KEY (updated_by) REFERENCES users(id) ON DELETE SET NULL
+);
+
+-- Order details table
+CREATE TABLE order_details (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    order_id BIGINT UNSIGNED NOT NULL,
+    product_id BIGINT UNSIGNED NOT NULL,
+    price DECIMAL(15,2) NOT NULL,
+    quantity INT DEFAULT 1,
+    total DECIMAL(15,2) NOT NULL,
+    created_at TIMESTAMP NULL,
+    updated_at TIMESTAMP NULL,
+    FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
+    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE RESTRICT
+);
+
+-- Personal access tokens table
+CREATE TABLE personal_access_tokens (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    tokenable_type VARCHAR(255) NOT NULL,
+    tokenable_id BIGINT UNSIGNED NOT NULL,
+    name TEXT NOT NULL,
+    token VARCHAR(64) NOT NULL UNIQUE,
+    abilities TEXT NULL,
+    last_used_at TIMESTAMP NULL,
+    expires_at TIMESTAMP NULL,
+    created_at TIMESTAMP NULL,
+    updated_at TIMESTAMP NULL,
+    INDEX idx_personal_access_tokens_expires_at (expires_at)
+);
+
+-- Reviews table
+CREATE TABLE reviews (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    product_id BIGINT UNSIGNED NOT NULL,
+    customer_id BIGINT UNSIGNED NOT NULL,
+    rating INT NOT NULL,
+    title VARCHAR(255) NULL,
+    comment TEXT NULL,
+    images JSON NULL,
+    verified_purchase BOOLEAN DEFAULT FALSE,
+    helpful INT DEFAULT 0,
+    created_at TIMESTAMP NULL,
+    updated_at TIMESTAMP NULL,
+    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
+    FOREIGN KEY (customer_id) REFERENCES customers(id) ON DELETE CASCADE
+);
