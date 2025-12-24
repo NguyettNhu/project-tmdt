@@ -494,7 +494,8 @@ export default function PaymentPage() {
                   {items.map((item) => (
                     <div key={item.id} className="flex gap-3">
                       <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center shrink-0">
-                        <Shirt className="w-8 h-8 text-gray-400" />
+                        <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                    
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="font-medium text-gray-900 text-sm truncate">{item.name}</p>
