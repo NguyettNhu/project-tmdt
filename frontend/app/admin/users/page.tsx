@@ -180,19 +180,94 @@ export default function UsersPage() {
           </TabsContent>
 
           {/* Staff Tab */}
-          <TabsContent value="staff" className="space-y-4">
+          <TabsContent value="customers" className="space-y-4">
             <Card>
-              <CardContent className="py-16">
-                <div className="text-center">
-                  <Construction className="w-16 h-16 mx-auto text-yellow-500 mb-4" />
-                  <h3 className="text-xl font-semibold text-gray-800 mb-2">
-                    Tính năng đang phát triển
-                  </h3>
-                  <p className="text-gray-500 max-w-md mx-auto">
-                    Chức năng quản lý nhân viên đang được phát triển và sẽ sớm được cập nhật.
-                    Vui lòng quay lại sau.
-                  </p>
+              <CardHeader>
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                  <CardTitle>Danh sách nhân viên</CardTitle>
+                  <Input
+                    placeholder="Tìm kiếm khách hàng..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full sm:w-64"
+                  />
                 </div>
+              </CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Avatar</TableHead>
+                      <TableHead>Nhân viên</TableHead>
+                      <TableHead>Số điện thoại</TableHead>
+                      <TableHead>Địa chỉ</TableHead>
+                      <TableHead>Ngày tham gia</TableHead>
+                      <TableHead>Trạng thái</TableHead>
+                      <TableHead className="text-right">Thao tác</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredCustomers.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={7} className="text-center py-8 text-gray-500">
+                          Không tìm thấy nhân viên nào
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      filteredCustomers.map((customer) => (
+                        <TableRow key={customer.id}>
+                          <TableCell>
+                            <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
+                              {customer.image ? (
+                                <img
+                                  src={getImageUrl(customer.image, 'customer')}
+                                  alt={customer.name}
+                                  className="w-full h-full object-cover"
+                                />
+                              ) : (
+                                <span className="text-gray-500 text-lg">
+                                  {customer.name.charAt(0).toUpperCase()}
+                                </span>
+                              )}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div>
+                              <p className="font-medium">{customer.name}</p>
+                              <p className="text-sm text-gray-500">{customer.email}</p>
+                            </div>
+                          </TableCell>
+                          <TableCell>{customer.phone || 'N/A'}</TableCell>
+                          <TableCell className="max-w-[200px] truncate">{customer.address || 'N/A'}</TableCell>
+                          <TableCell>{formatDate(customer.created_at)}</TableCell>
+                          <TableCell>
+                            <Badge variant={customer.status === 1 ? 'success' : 'destructive'}>
+                              {customer.status === 1 ? 'Hoạt động' : 'Đã khóa'}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex justify-end gap-2">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => handleViewCustomerDetail(customer)}
+                              >
+                                Chi tiết
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant={customer.status === 1 ? 'destructive' : 'default'}
+                                onClick={() => handleToggleCustomerStatus(customer.id)}
+                              >
+                                {customer.status === 1 ? 'Khóa' : 'Mở khóa'}
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    )}
+                  </TableBody>
+                </Table>
               </CardContent>
             </Card>
           </TabsContent>
@@ -203,9 +278,9 @@ export default function UsersPage() {
       <Dialog open={isDetailDialogOpen} onOpenChange={setIsDetailDialogOpen}>
         <DialogContent className="max-w-lg">
           <DialogHeader>
-            <DialogTitle>Chi tiết khách hàng</DialogTitle>
+            <DialogTitle>Chi tiết </DialogTitle>
             <DialogDescription>
-              Thông tin chi tiết của khách hàng
+              Thông tin chi tiết 
             </DialogDescription>
           </DialogHeader>
           {selectedUser && (
